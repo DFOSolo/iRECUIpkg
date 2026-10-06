@@ -1,0 +1,4 @@
+"","PERIOD","SPECIES","AREA_NAME","DAILY_LIMIT_PC","ANNUAL_LIMIT_PC","NON_RETENTION","CLOSED_YN","PFMA","area_id","lrg_area_id_id"
+"1","1968-09-15","Chinook","",2,10,"N","N","",,
+"2","1968-09-15","Coho","",4,NA,"N","N","",,
+"3","1968-09-15","Halibut","",1,10,"N","N","",,

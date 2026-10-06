@@ -1,0 +1,116 @@
+AREA_ID,TEXT,ESTIMATIONAREA,LRG_AREA_NME,SML_AREA_NME,PROGRAM,LRG_AREA_ID,STD_REF_TYPE_CDE,PROJECT_GRP_LNG,ADMINISTRATIVE_AREA
+86,A002E,2E,Area 2E,Area 2E,HG,633,QCCSA2012-2E,North Coast,3
+33,Area 2 East,2E,Area 2E,Area 2E,HG,633,QCCSA2012-2E,North Coast,3
+102,A002W,2W,Area 2W,Area 2W,HG,634,PRCSA2012-2W,North Coast,3
+34,Area 2 West,2W,Area 2W,Area 2W,HG,634,PRCSA2012-2W,North Coast,3
+72,A029IR,SECTION 1 - LFM,Area 29 (In River),Area 29 (In River),LF,630,1-LFMREC2014,Lower Fraser,2
+48,Area 29 In River,SECTION 1 - LFM,Area 29 (In River),Area 29 (In River),LF,630,1-LFMREC2014,Lower Fraser,2
+77,A016,PFMA 16,Area 16,Area 16,GST,4,16,South Coast,0
+26,Area 16,PFMA 16,Area 16,Area 16,GST,4,16,South Coast,0
+60,A026,PFMA 26,Area 26,Area 26,KYU,189,26,South Coast,0
+43,Area 26,PFMA 26,Area 26,Area 26,KYU,189,26,South Coast,0
+103,A020,PFMA 20,Area 20,Area 20,JDF,632,20,South Coast,0
+35,Area 20,PFMA 20,Area 20,Area 20,JDF,632,20,South Coast,0
+84,A021,PFMA 21,Area 21,Area 21,RS,184,21,South Coast,0
+36,Area 21,PFMA 21,Area 21,Area 21,RS,184,21,South Coast,0
+67,A022,PFMA 22,Area 22,Area 22,RS,185,22,South Coast,0
+37,Area 22,PFMA 22,Area 22,Area 22,RS,185,22,South Coast,0
+38,Area 23,PFMA 23,Area 23,Area 23,BS,570,23,South Coast,0
+114,A023,PFMA 23,Area 23,Area 23,BS,570,23,South Coast,0
+74,A006,PFMA 6,Area 6,Area 6,CC,225,6,North Coast,3
+52,Area 6,PFMA 6,Area 6,Area 6,CC,225,6,North Coast,3
+58,A121,PFMA 121,Area 121,Area 121,RS,190,121,South Coast,0
+16,Area 121,PFMA 121,Area 121,Area 121,RS,190,121,South Coast,0
+95,A027,PFMA 27,Area 27,Area 27,QUAT,211,27,South Coast,0
+44,Area 27,PFMA 27,Area 27,Area 27,QUAT,211,27,South Coast,0
+112,A019,PFMA 19,Area 19,Area 19,GST,631,19,South Coast,0
+29,Area 19,PFMA 19,Area 19,Area 19,GST,631,19,South Coast,0
+107,A130,PFMA 130,Area 130,Area 130,NC,241,130,North Coast,3
+88,A008,PFMA 8,Area 8,Area 8,CC,228,8,North Coast,3
+54,Area 8,PFMA 8,Area 8,Area 8,CC,228,8,North Coast,3
+97,A108,PFMA 108,Area 108,Area 108,CC,238,108,North Coast,3
+10,Area 108,PFMA 108,Area 108,Area 108,CC,238,108,North Coast,3
+13,Area 110,PFMA 110,Area 110,Area 110,CC,240,110,North Coast,3
+108,A110,PFMA 110,Area 110,Area 110,CC,240,110,North Coast,3
+94,A111,PFMA 111,Area 111,Area 111,JST,208,111,South Coast,0
+14,Area 111,PFMA 111,Area 111,Area 111,JST,208,111,South Coast,0
+82,A125,PFMA 125,Area 125,Area 125,NS,193,125,South Coast,0
+19,Area 125,PFMA 125,Area 125,Area 125,NS,193,125,South Coast,0
+69,A126,PFMA 126,Area 126,Area 126,KYU,194,126,South Coast,0
+20,Area 126,PFMA 126,Area 126,Area 126,KYU,194,126,South Coast,0
+73,A028,PFMA 28,Area 28,Area 28,GST,8,28,South Coast,0
+45,Area 28,PFMA 28,Area 28,Area 28,GST,8,28,South Coast,0
+93,A102,PFMA 102,Area 102,Area 102,HG,231,102,North Coast,3
+4,Area 102,PFMA 102,Area 102,Area 102,HG,231,102,North Coast,3
+98,A007,PFMA 7,Area 7,Area 7,CC,227,7,North Coast,3
+53,Area 7,PFMA 7,Area 7,Area 7,CC,227,7,North Coast,3
+91,A004,PFMA 4,Area 4,Area 4,NC,215,4,North Coast,3
+50,Area 4,PFMA 4,Area 4,Area 4,NC,215,4,North Coast,3
+90,A001,PFMA 1,Area 1,Area 1,HG,213,1,North Coast,3
+1,Area 1,PFMA 1,Area 1,Area 1,HG,213,1,North Coast,3
+32,Area 2,PFMA 2,Area 2,Area 2,HG,224,2,North Coast,3
+115,A002,PFMA 2,Area 2,Area 2,HG,224,2,North Coast,3
+62,A142,PFMA 142,Area 142,Area 142,HG,242,142,North Coast,3
+24,Area 142,PFMA 142,Area 142,Area 142,HG,242,142,North Coast,3
+63,A107,PFMA 107,Area 107,Area 107,CC,236,107,North Coast,3
+9,Area 107,PFMA 107,Area 107,Area 107,CC,236,107,North Coast,3
+101,A127,PFMA 127,Area 127,Area 127,QUAT,212,127,South Coast,0
+21,Area 127,PFMA 127,Area 127,Area 127,QUAT,212,127,South Coast,0
+76,A015,PFMA 15,Area 15,Area 15,GST,3,15,South Coast,0
+25,Area 15,PFMA 15,Area 15,Area 15,GST,3,15,South Coast,0
+83,A017,PFMA 17,Area 17,Area 17,GST,5,17,South Coast,0
+27,Area 17,PFMA 17,Area 17,Area 17,GST,5,17,South Coast,0
+85,A018,PFMA 18,Area 18,Area 18,GST,6,18,South Coast,0
+28,Area 18,PFMA 18,Area 18,Area 18,GST,6,18,South Coast,0
+66,A105,PFMA 105,Area 105,Area 105,CC,234,105,North Coast,3
+7,Area 105,PFMA 105,Area 105,Area 105,CC,234,105,North Coast,3
+106,A104,PFMA 104,Area 104,Area 104,NC,233,104,North Coast,3
+6,Area 104,PFMA 104,Area 104,Area 104,NC,233,104,North Coast,3
+89,A106,PFMA 106,Area 106,Area 106,CC,235,106,North Coast,3
+8,Area 106,PFMA 106,Area 106,Area 106,CC,235,106,North Coast,3
+92,A124,PFMA 124,Area 124,Area 124,CS,192,124,South Coast,0
+18,Area 124,PFMA 124,Area 124,Area 124,CS,192,124,South Coast,0
+96,A010,PFMA 10,Area 10,Area 10,JST,210,10,South Coast,0
+2,Area 10,PFMA 10,Area 10,Area 10,JST,210,10,South Coast,0
+87,A012,PFMA 12,Area 12,Area 12,JST,209,12,South Coast,0
+15,Area 12,PFMA 12,Area 12,Area 12,JST,209,12,South Coast,0
+99,A029GS,PFMA 29,Area 29,Area 29,GST,9,29,South Coast,0
+46,Area 29,PFMA 29,Area 29,Area 29,GST,9,29,South Coast,0
+47,Area 29 Georgia Strait,PFMA 29,Area 29,Area 29,GST,9,29,South Coast,0
+113,A029,PFMA 29,Area 29,Area 29,GST,9,29,South Coast,0
+105,A009,PFMA 9,Area 9,Area 9,CC,229,9,North Coast,3
+55,Area 9,PFMA 9,Area 9,Area 9,CC,229,9,North Coast,3
+65,A003,PFMA 3,Area 3,Area 3,NC,214,3,North Coast,3
+49,Area 3,PFMA 3,Area 3,Area 3,NC,214,3,North Coast,3
+59,A025,PFMA 25,Area 25,Area 25,NS,188,25,South Coast,0
+42,Area 25,PFMA 25,Area 25,Area 25,NS,188,25,South Coast,0
+61,A013,PFMA 13,Area 13,Area 13,GST,1,13,South Coast,0
+22,Area 13,PFMA 13,Area 13,Area 13,GST,1,13,South Coast,0
+117,A013S,PFMA 13,Area 13 SoG,Area 13 SoG,GST,650,13,South Coast,0
+116,A013N,PFMA 13,Area 13 JST,Area 13 JST,GST,651,13,South Coast,0
+57,A014,PFMA 14,Area 14,Area 14,GST,2,14,South Coast,0
+23,Area 14,PFMA 14,Area 14,Area 14,GST,2,14,South Coast,0
+71,A011,PFMA 11,Area 11,Area 11,JST,207,11,South Coast,0
+12,Area 11,PFMA 11,Area 11,Area 11,JST,207,11,South Coast,0
+79,A101,PFMA 101,Area 101,Area 101,HG,230,101,North Coast,3
+3,Area 101,PFMA 101,Area 101,Area 101,HG,230,101,North Coast,3
+70,A103,PFMA 103,Area 103,Area 103,NC,232,103,North Coast,3
+5,Area 103,PFMA 103,Area 103,Area 103,NC,232,103,North Coast,3
+64,A024,PFMA 24,Area 24,Area 24,CS,187,24,South Coast,0
+41,Area 24,PFMA 24,Area 24,Area 24,CS,187,24,South Coast,0
+104,A005,PFMA 5,Area 5,Area 5,CC,226,5,North Coast,3
+51,Area 5,PFMA 5,Area 5,Area 5,CC,226,5,North Coast,3
+100,A109,PFMA 109,Area 109,Area 109,CC,239,109,North Coast,3
+11,Area 109,PFMA 109,Area 109,Area 109,CC,239,109,North Coast,3
+68,A123,PFMA 123,Area 123,Area 123,BS,191,123,South Coast,0
+17,Area 123,PFMA 123,Area 123,Area 123,BS,191,123,South Coast,0
+80,A019SI,19-A,Area 19 (GS),Area 19 (GS),GST,7,GSCS2012-19-A,South Coast,0
+31,Area 19 Saanich Inlet only,19-A,Area 19 (GS),Area 19 (GS),GST,7,GSCS2012-19-A,South Coast,0
+78,A023BS,AREA 23 (BARKLEY),Area 23 (Barkley),Area 23 (Barkley),BS,186,WCCS2012-23-BK,South Coast,0
+40,Area 23 Barkley Sound,AREA 23 (BARKLEY),Area 23 (Barkley),Area 23 (Barkley),BS,186,WCCS2012-23-BK,South Coast,0
+75,A023AI,AREA 23 (ALBERNI CANAL),Area 23 (Alberni Canal),Area 23 (Alberni Canal),BS,297,WCCS2012-23-AC,South Coast,0
+39,Area 23 Alberni Inlet,AREA 23 (ALBERNI CANAL),Area 23 (Alberni Canal),Area 23 (Alberni Canal),BS,297,WCCS2012-23-AC,South Coast,0
+110,A020W,AREA 20 (WEST),Area 20 (West),Area 20 (West),RS,672,JDFCS2012-20-West,South Coast,0
+111,A020E,AREA 20 (EAST),Area 20 (East),Area 20 (East),JDF,671,JDFCS2012-20-East,South Coast,0
+81,A019MP,NA,Area 19 (JDF),Area 19 (JDF),JDF,337,JDFCS2012-19-JDF,South Coast,0
+30,Area 19 Main Portion,NA,Area 19 (JDF),Area 19 (JDF),JDF,337,JDFCS2012-19-JDF,South Coast,0

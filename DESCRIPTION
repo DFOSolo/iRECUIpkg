@@ -1,0 +1,54 @@
+Package: iRECUIpkg
+Title: RShiny User Interface For iREC Data Managment
+Version: 2026.10.06.1521
+Authors@R: 
+    person("Kristopher", "Hein", , "kristopher.hein@dfo-mpo.gc.ca", role = c("aut", "cre"))
+Description: UI for data management of the iREC program.
+License: use_mit_license()
+Imports: 
+    anytime,
+    base,
+    DBI,
+    dipsaus,
+    dipsaus,
+    dplyr,
+    dplyr,
+    DT,
+    emoji,
+    fs,
+    future,
+    glue,
+    haven,
+    httr,
+    jsonlite,
+    lexicon,
+    lubridate,
+    magrittr,
+    openxlsx,
+    progress,
+    readr,
+    ROracle,
+    sentimentr,
+    shiny,
+    shinyauthr,
+    shinycssloaders,
+    shinyjs,
+    shinyWidgets,
+    sodium,
+    stringi,
+    stringr,
+    syuzhet,
+    textTools,
+    tibble,
+    tidyr,
+    tidyverse,
+    tools,
+    utils,
+    uuid,
+    xml2,
+    xtable,
+    zip
+Config/roxygen2/version: 8.1.0
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)

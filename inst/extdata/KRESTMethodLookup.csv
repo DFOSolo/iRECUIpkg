@@ -1,0 +1,15 @@
+METHOD_ID,TEXT,GEARTYPE,DATATYPE,KREST_CDE
+1,Angling from boat,JHO,Boat,Angling from boat
+2,Angling from shore,JHO,Shore,Angling from shore
+3,Beach digging or hand picking,HP,Shore,10 - Dig/Beach
+4,Dive-based or other,DIV,Other,8 - Dive
+5,Shellfish trapping by boat,TRP,Boat,Shellfish trapping by boat
+6,Shellfish trapping from shore or dock,TRP,Shore,Shellfish trapping from shore or dock
+7,Unspecified,UNS,Other,Other
+8,(blank),UNS,Other,Other
+9,angleboat,JHO,Boat,Angling from boat
+10,trapboat,TRP,Boat,Shellfish trapping by boat
+11,beach,HP,Shore,10 - Dig/Beach
+12,trapshore,TRP,Shore,Shellfish trapping from shore or dock
+13,angleshore,JHO,Shore,Angling from shore
+14,dive,DIV,Other,8 - Dive

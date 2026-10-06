@@ -1,0 +1,6 @@
+devtools::document()
+devtools::load_all()
+run_iRECUI()
+
+remotes::install_github("https://github.com/DFOSolo/iRECUIpkg.git")
+iRECUIpkg::run_iRECUI()

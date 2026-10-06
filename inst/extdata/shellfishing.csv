@@ -1,0 +1,7 @@
+"SHELLFISH_ID","TEXT","SHELLFISHING","VALUE"
+0,"Unspecified","",6
+1,"No Shellfishing","No",1
+2,"Crab","Yes",2
+3,"Prawn/shrimp","Yes",3
+5,"Crab and prawn/shrimp","Yes",5
+6,"NULL","",0

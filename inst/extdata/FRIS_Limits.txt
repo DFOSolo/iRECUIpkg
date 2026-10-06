@@ -1,0 +1,105 @@
+with base as (
+select
+:Year || '-' || :Month || '-' || :Day as period,
+fsre.reference_no, fsreS.reference_no as sup_ref_no, fsreR.reference_no as Rev_ref_no,fsre.SUPERSEDING_REGULATION_ID,
+fsre.fsre_id, rt.type_name_eng as reg_type, rst.type_name_Eng as status, mmno.section_text_eng as mm_notes,
+fsre.effective_Datetime, fsre.expiry_Datetime, fsre.superseded_datetime, fsre.updated_date, fsre.created_Date, spp.common_name_eng as SPECIES,
+species_Group_name_eng, fsre.areas, fsre.sub_Areas, fsre.minsize_cm, fsre.daily_limit_pc, fsre.posession_limit_pc, 
+fsre.annual_limit_pc, fsre.closed_yn, fsre.non_retention_yn, fsre.opening_closure_areas, fsre.all_species_limits, fsre.description, 
+fsre.areas_id_list as str1, fsre.sub_areas_id_list as str2
+FROM   fris_v2.fishery_species_regulations@pacific_lakehouse_fris_v2_dblink  fsre
+left join fris_v2.species@pacific_lakehouse_fris_v2_dblink spp on fsre.species_id = spp.spec_id
+left join fris_v2.SPECIES_GROUPS@pacific_lakehouse_fris_v2_dblink sppG on fsre.species_group_id = sppG.spgr_id
+left join fris_v2.REGULATION_STATUS_TYPES@pacific_lakehouse_fris_v2_dblink rst on fsre.regulation_Status_type_id = rst.rsty_id
+left join fris_v2.REGULATION_TYPES@pacific_lakehouse_fris_v2_dblink rt on fsre.regulation_type_id = rt.regty_id
+left join fris_v2.MANAGEMENT_MEASURE_NOTES_VW@pacific_lakehouse_fris_v2_dblink mmno on mmno.fishery_species_regulation_id = fsre.fsre_id
+left join fris_v2.fishery_species_regulations@pacific_lakehouse_fris_v2_dblink  fsreS on fsre.SUPERSEDING_REGULATION_ID = fsreS.fsre_id
+left join fris_v2.fishery_species_regulations@pacific_lakehouse_fris_v2_dblink  fsreR on fsre.REVOKES_REGULATION_ID = fsreR.fsre_id
+where 1=1
+and rt.regty_id in (61, 62, 81, 161, 162, 163)
+and rst.rsty_id  in (2, 4)
+           and to_date(:Year || '-' || :Month || '-' || :Day,'YYYY-MM-DD') between fsre.effective_Datetime and nvl(fsre.superseded_Datetime,fsre.expiry_datetime)
+           order by  fsre.fsre_id desc, fsre.reference_no nulls first
+           )
+
+    , rowdata2 as (
+    select  t.fsre_id,t.str1 as str,  trim(regexp_substr(t.str1, '[^,]+', 1, levels.column_value))  as fmar_id_id, 'PFMA' as area_type
+from base t, table(cast(multiset(select level from dual connect by  level <= length (regexp_replace(t.str1, '[^,]+'))  + 1) as sys.OdciNumberList)) levels
+union
+    select  t.fsre_id,t.str2,  trim(regexp_substr(t.str2, '[^,]+', 1, levels.column_value))  as fmar_id_id, 'PFMA Sub' as area_type
+from base t, table(cast(multiset(select level from dual connect by  level <= length (regexp_replace(t.str2, '[^,]+'))  + 1) as sys.OdciNumberList)) levels
+)
+ , rslt2 as (   select rowdata2.fsre_id, rowdata2.str as areas_id_list, fmar.fmar_id, fmar.area_name_eng as area_name, rowdata2.area_type , fmarP.area_name_eng as parent_area_nme
+    from rowdata2  
+    left join fris_v2.FISHERY_MGMT_AREAS@pacific_lakehouse_fris_v2_dblink fmar on rowdata2.fmar_id_id = fmar.fmar_id
+    left join fris_v2.FISHERY_MGMT_AREAS@pacific_lakehouse_fris_v2_dblink fmarP on fmar.parent_fishery_mgmt_area_id = fmarP.fmar_id
+    where rowdata2.str is not null
+    )
+          
+, final as ( select b.*, case when r.area_type = 'PFMA' then r.area_name else r.parent_area_nme end as PFMA, r.area_name, r.area_type 
+ from base b 
+ left join rslt2 r on b.fsre_id = r.fsre_id
+ )
+ 
+ 
+ , sum1 as ( 
+select  
+ period,
+ reference_no,
+ reg_type,
+ case when SPECIES like '%Chinook%' then 'Chinook' when SPECIES like '%Coho%' then 'Coho' else SPECIES end as species, 
+ PFMA as area_name,
+ closed_yn,
+ non_retention_yn,
+ max(minsize_cm) as minsize_cm, 
+ case when max(nvl(daily_limit_pc,0)) = 0 then null else max(nvl(daily_limit_pc,0)) end as daily_limit_pc, 
+ case when max(nvl(posession_limit_pc,0)) = 0 then null else  max(nvl(posession_limit_pc,0)) end as posession_limit_pc,
+ case when max(nvl(annual_limit_pc,0)) = 0 then null else max(nvl(annual_limit_pc,0)) end as annual_limit_pc, 
+ LISTAGG(case when area_type = 'PFMA Sub' then SUBSTR(area_name, INSTR(area_name, '-') + 1) end, ', ') WITHIN GROUP (ORDER BY area_type) AS pfma_sub_list,
+ count(*) as rws, pfma
+ from final 
+ where 1=1
+ and (daily_limit_pc is not null or annual_limit_pc is not null)
+ and (SPECIES in ('Halibut', 'Lingcod') or species like '%Chinook%' or SPECIES like '%Coho%')
+ group by period,
+ reference_no,
+ reg_type,
+ case when SPECIES like '%Chinook%' then 'Chinook' when SPECIES like '%Coho%' then 'Coho' else SPECIES end,
+ PFMA,
+ non_retention_yn,closed_yn
+)
+, sum2 as (
+select period, species, 'A' || substr('00' || pfma,-3) as area_name, max(daily_limit_pc) as daily_limit_pc,
+max(annual_limit_pc) as annual_limit_pc, listagg(distinct non_retention_yn, ', ') WITHIN GROUP (ORDER BY non_retention_yn)  as non_retention,
+listagg(distinct closed_yn, ', ') WITHIN GROUP (ORDER BY closed_yn)  as closed_yn, PFMA
+from sum1    
+group by period, species, area_name
+order by species
+)
+, sum3 as (select * from sum2
+union
+select PERIOD, SPECIES, 'A002E' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '2'
+union
+select PERIOD, SPECIES, 'A002W' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '2'
+union
+select PERIOD, SPECIES, 'A019IR' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '19'
+union
+select PERIOD, SPECIES, 'A019MP' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '19'
+union
+select PERIOD, SPECIES, 'A019SI' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '19'
+union
+select PERIOD, SPECIES, 'A020E' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '20'
+union
+select PERIOD, SPECIES, 'A020W' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '20'
+union
+select PERIOD, SPECIES, 'A023AI' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '23'
+union
+select PERIOD, SPECIES, 'A023BS' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '23'
+union
+select PERIOD, SPECIES, 'A029GS' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '29'
+union
+select PERIOD, SPECIES, 'A029IR' as AREA_NAME, DAILY_LIMIT_PC, ANNUAL_LIMIT_PC, NON_RETENTION, CLOSED_YN, PFMA from sum2 where pfma = '29'
+)
+
+/*select * from sum3 
+order by cast(pfma as number), species*/
