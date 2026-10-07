@@ -3,11 +3,15 @@
 \name{load_resp}
 \alias{load_resp}
 \title{Function to load response files for either CREST or KREST format
-based on the destination}
+based on the destination
+parameters are:
+inFile =}
 \usage{
 load_resp(inFile, Dest)
 }
 \description{
 Function to load response files for either CREST or KREST format
 based on the destination
+parameters are:
+inFile =
 }

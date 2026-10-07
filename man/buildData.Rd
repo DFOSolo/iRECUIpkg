@@ -2,10 +2,14 @@
 % Please edit documentation in R/Bias_KREST.R
 \name{buildData}
 \alias{buildData}
-\title{function to format the csv file data to a format KREST can injest}
+\title{function to format the csv file data to a format KREST can injest
+parameters are:
+cor_vals = the csv file from the bias code loaded into a dataframe}
 \usage{
 buildData(cor_vals)
 }
 \description{
 function to format the csv file data to a format KREST can injest
+parameters are:
+cor_vals = the csv file from the bias code loaded into a dataframe
 }

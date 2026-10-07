@@ -2,10 +2,18 @@
 % Please edit documentation in R/Bias_KREST.R
 \name{SendBiasJSON}
 \alias{SendBiasJSON}
-\title{function wrapper to send and promote bias correction data in/to KREST}
+\title{function wrapper to send and promote bias correction data in/to KREST
+parameters are:
+Jsons = the dataframe with JSONs for the estimates from buidlBiasJSONS
+krestendpoint = the KREST server endpoint we need to talk to
+login = the login credentials to use to talk to KREST}
 \usage{
 SendBiasJSON(Jsons, krestendpoint, login)
 }
 \description{
 function wrapper to send and promote bias correction data in/to KREST
+parameters are:
+Jsons = the dataframe with JSONs for the estimates from buidlBiasJSONS
+krestendpoint = the KREST server endpoint we need to talk to
+login = the login credentials to use to talk to KREST
 }

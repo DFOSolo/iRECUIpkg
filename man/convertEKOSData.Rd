@@ -2,10 +2,12 @@
 % Please edit documentation in R/common_Code.R
 \name{convertEKOSData}
 \alias{convertEKOSData}
-\title{convert EKOS data format to curent format}
+\title{convert EKOS data format to curent format
+taken from Nick's original analysis code - see his code for details}
 \usage{
 convertEKOSData(ekos_data)
 }
 \description{
 convert EKOS data format to curent format
+taken from Nick's original analysis code - see his code for details
 }

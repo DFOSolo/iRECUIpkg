@@ -2,10 +2,20 @@
 % Please edit documentation in R/Bias_KREST.R
 \name{SendBiasiRECP}
 \alias{SendBiasiRECP}
-\title{function to "post" a bias correction data packet to KREST}
+\title{function to "post" a bias correction data packet to KREST
+parameters are:
+krestendpoint = the krest server endpoint we want to talk to
+authToken = the authorization token used to authenticate
+bodyj = the JSON data to send
+updateEstimate = boolena for new or update}
 \usage{
 SendBiasiRECP(krestendpoint, authToken, bodyj, updateEstimate)
 }
 \description{
 function to "post" a bias correction data packet to KREST
+parameters are:
+krestendpoint = the krest server endpoint we want to talk to
+authToken = the authorization token used to authenticate
+bodyj = the JSON data to send
+updateEstimate = boolena for new or update
 }

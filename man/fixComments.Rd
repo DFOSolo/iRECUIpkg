@@ -2,10 +2,16 @@
 % Please edit documentation in R/common_Code.R
 \name{fixComments}
 \alias{fixComments}
-\title{fix the comments parsing for email adress and phone numbers and emoji's}
+\title{fix the comments parsing for email adress and phone numbers and emoji's
+parameters are:
+survey_data = dataframe with the comment column to check
+cmnt = the column name to search for - optional default is COMMENT}
 \usage{
 fixComments(survey_data, cmnt = "COMMENT")
 }
 \description{
 fix the comments parsing for email adress and phone numbers and emoji's
+parameters are:
+survey_data = dataframe with the comment column to check
+cmnt = the column name to search for - optional default is COMMENT
 }

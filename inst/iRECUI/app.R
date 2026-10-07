@@ -980,7 +980,7 @@ observeEvent(input$PostBIAS, {
         rws <- Load_C_Bias(input$BiasFile$datapath, dest)
       } else {
         SetupKrest("P")
-        rws <- Load_K_Bias(input$BiasFile$datapath, dest)
+        rws <- Load_K_Bias(input$BiasFile$datapath)
       }},
 
       error = function(e) {

@@ -2,10 +2,18 @@
 % Please edit documentation in R/Bias_KREST.R
 \name{SendBiasiRECD}
 \alias{SendBiasiRECD}
-\title{function to delete a bias correction data packet in KREST based on GUID}
+\title{function to delete a bias correction data packet in KREST based on GUID
+parameters are:
+krestendpoint = the krest server endpoint we want to talk to
+authToken = the authorization token used to authenticate
+guid = the guid of the estimate we want to delete}
 \usage{
 SendBiasiRECD(krestendpoint, authToken, guid)
 }
 \description{
 function to delete a bias correction data packet in KREST based on GUID
+parameters are:
+krestendpoint = the krest server endpoint we want to talk to
+authToken = the authorization token used to authenticate
+guid = the guid of the estimate we want to delete
 }

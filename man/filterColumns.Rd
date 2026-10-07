@@ -2,10 +2,18 @@
 % Please edit documentation in R/common_Code.R
 \name{filterColumns}
 \alias{filterColumns}
-\title{filter columns base on list}
+\title{filter columns base on list
+Simple check to pull only the columns in the list cols
+parameters are:
+survey_data = data frame of interest
+cols = list of column names to check for}
 \usage{
 filterColumns(survey_data, cols)
 }
 \description{
 filter columns base on list
+Simple check to pull only the columns in the list cols
+parameters are:
+survey_data = data frame of interest
+cols = list of column names to check for
 }

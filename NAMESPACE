@@ -2,6 +2,7 @@
 
 export(GetYearMonth)
 export(Load_C_Ests)
+export(Load_K_Bias)
 export(Load_K_Ests)
 export(SetupKrest)
 export(Write_C_ResponsesIn)

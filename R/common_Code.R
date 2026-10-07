@@ -5,14 +5,12 @@
 auto_notify <- function(text) {
   # Automatically grabs the active Shiny session
   ctx_session <- shiny::getDefaultReactiveDomain()
-
+ # if in shiny then show it as a notification
   if (!is.null(ctx_session)) {
     shiny::showNotification(text, session = ctx_session)
-
-    message(text)
-  } else {
-    message(text)
   }
+  # always send the message to the console
+    message(text)
 }
 
 
@@ -71,32 +69,27 @@ fixValues <- function(survey_data) {
   if ("CHECKCRABSPRAWNS" %in% names(df1)) {
     df1$CHECKCRABSPRAWNS[df1$CHECKCRABSPRAWNS == 999] <- 9
   }
-  #browser()
+
   if ("STARTDAY" %notin% names(df1)) {
     df1$STARTDAY <- 15
     df1$ENDDAY <- 15
   }
 
   if ("COMPLETESURVEY" %in% names(df1)) {
-
     df1$COMPLETESURVEY[df1$COMPLETESURVEY == 1] <- 'Complete'
     df1$COMPLETESURVEY[df1$COMPLETESURVEY == 0] <- 'Incomplete'
     df1$COMPLETESURVEY[is.na(df1$COMPLETESURVEY)] <- 'NA'
   }
 
-
-  for(hl in 1:12) {
+  for (hl in 1:12) {
     hlf <- paste0("HALIBUTLENGTH.", hl)
     if (hlf %in% names(df1)) {
-
-      if (haven::is.labelled(df1[[hlf]])){
+      if (haven::is.labelled(df1[[hlf]])) {
         df1 <- haven::zap_labels(df1, user_na = TRUE)
       }
-
       if (class(df1[[hlf]]) == "character") {
         df1[[hlf]] <- suppressWarnings(as.double(df1[[hlf]]))
       }
-
     }
   }
 
@@ -104,42 +97,54 @@ fixValues <- function(survey_data) {
 }
 
 #' fix the comments parsing for email adress and phone numbers and emoji's
-
+#' parameters are:
+#' survey_data = dataframe with the comment column to check
+#' cmnt = the column name to search for - optional default is COMMENT
 fixComments <- function(survey_data, cmnt = 'COMMENT' ) {
   df1 <- survey_data
   if (cmnt %in% names(df1)) {
+    # check for emojis
   df1$TST <- emoji::emoji_detect(df1[[cmnt]])
-  #browser()
+    # replace any emoji's found with string emoji::emoji_replace_name("🤔") = ":thinking_face:"
   df1[[cmnt]][df1$TST == TRUE & !is.na(df1$TST)] <- emoji::emoji_replace_name(df1[[cmnt]][df1$TST == TRUE & !is.na(df1$TST)])
+   # handle any weird character sets
   df1[[cmnt]] <- stringi::stri_trans_general(df1[[cmnt]], "latin-ascii")
+   # remove any non-printable characters
   df1[[cmnt]] <- textTools::str_rm_non_printable(df1[[cmnt]])
-
+   # check for emails in the comments and replace them
   pattern <- "[^@\\s]*@[^@\\s]*\\.[^@\\s]*"
   replacement <- "[email removed]"
   df1[[cmnt]] <- gsub(pattern, replacement, df1[[cmnt]], perl = TRUE)
+   # check for phone numbers and replace them too
   pattern <- "\\(?\\d{3}\\)?[ -]?\\d{3}[ -]?\\d{4}"
   replacement <- "[phone number removed]"
   df1[[cmnt]] <- gsub(pattern, replacement, df1[[cmnt]], perl = TRUE)
+   # comments can only be 4000 characters so truncate them to ensure they fit.
   df1[[cmnt]] <- str_sub(df1[[cmnt]], 1, 4000)
   }
-  #browser()
+
   return(df1)
 }
 
 #' filter columns base on list
-
+#' Simple check to pull only the columns in the list cols
+#' parameters are:
+#' survey_data = data frame of interest
+#' cols = list of column names to check for
 filterColumns <- function(survey_data, cols) {
   df1 <- survey_data
   for (item in cols) {
     names(df1)[names(df1)==tolower(item)] <- item
   }
-
   return(df1[, names(df1) %in% cols])
-
 }
 
 #' check if a field exists and return its position
-
+#' parameters are:
+#' arry = the array to search
+#' sval = the item to search for
+#' srch = element to check rather than all the elements(maybe?)
+#' skippos = list of element positions to skip over
 checkfld <- function(arry, sval, srch, skippos) {
   mpos <- 0
   for (s in 1:length(arry)) {
@@ -161,7 +166,10 @@ checkfld <- function(arry, sval, srch, skippos) {
 }
 
 #' check to see what a date format is
-
+#' parameters are:
+#' dteA = list of potential dates
+#' year = year value to check for
+#' month = month value to check for
 checkDate <- function(dteA, year, month){
   dte<-0
   mpos <- 0
@@ -196,7 +204,7 @@ checkDate <- function(dteA, year, month){
 }
 
 #' convert EKOS data format to curent format
-
+#' taken from Nick's original analysis code - see his code for details
 convertEKOSData <- function(ekos_data)  {
   UnspecifiedText <- "UN" #Unspecified"
 
@@ -329,53 +337,12 @@ convertEKOSData <- function(ekos_data)  {
   return(ekos_data)
 }
 
-#'Function to load response files for either CREST or KREST format
-#' based on the destination
-
-load_resp <- function(inFile, Dest){
-  baseName <- tools::file_path_sans_ext(inFile$name)
-  df <- read_sav(inFile$datapath)
-  if ("TYPE" %in% names(df)) {
-    yr <- gsub("[^0-9.-]", "", df$TYPE[[1]])
-    for (m in month_nms) {
-      if (grepl(tolower(m), tolower(df$TYPE[[1]]))) {
-        mnth_str <- m
-        break
-      }
-    }
-  } else {
-    for (y in 2012:year(now())) {
-      if (grepl(y, inFile$name)) {
-        yr <- y
-        break
-      }
-    }
-    for (m in month_nms) {
-      if (grepl(tolower(m), tolower(inFile$name))) {
-        mnth_str <- m
-        break
-      }
-    }
-  }
-  destpath <- dirname(input$file_input$datapath)
-  datafile <- input$file_input$name
-
-  if (mnth_str %in% c('January', 'February', 'March')) {
-    yr_name <- paste0(as.numeric(yr) - 1, '-' , as.numeric(substr(yr, 3, 4)))
-  } else {
-    yr_name <- paste0(yr, '-' , as.numeric(substr(yr, 3, 4)) + 1)
-  }
-  rslt <- WriteResponsesIn(sourcepath, destpath, datapath, datafile, yr_name, df)
-  return(rslt)
-}
-
 #' Function to build a connection to one of the oracle databases iREC references
 #' parameter "S" indicates which server to attach to .
 #' S = P means Production server for the OTOLITH_V1. schema (where CREST data (and iREC) are stored)
 #' S = T  means Test server for the OTOLITH_V1. schema (where CREST data (and iREC) are stored)
 #' S = L  means the ReadOnly LakeHose account to get data from FRIS and KREST
 #' credentials are stored in a text file in the user's Documents folder in a subfolder named OracleCreds
-
 setupOracleConn <- function(S) {
   db_conn <- NULL
   db_driver <- DBI::dbDriver("Oracle")
@@ -547,7 +514,6 @@ buildsql <- function(sqlin, field, vals) {
 #' Function to calculate the mode from a list
 #' parameters are:
 #' x = list to calculate the modal value from
-
 get_mode <- function(x) {
   unique_values <- unique(x)
   # Count the frequency of each unique value
@@ -561,7 +527,6 @@ get_mode <- function(x) {
 #' Function to load look up tables from CREST
 #' parameters are:
 #' df_tbl_nmes = list of table names to load
-
 load_CE_lus <- function(ccon, df_tbl_nmes) {
   rtn_list <- list()
   for (q in df_tbl_nmes) {
@@ -589,7 +554,6 @@ load_CE_lus <- function(ccon, df_tbl_nmes) {
 #' Function to return pretty version of month
 #' parameters are:
 #' mIn = month to convert.  Can be a number or short or long version of the month name
-
 Expmonth <- function (mIn) {
   return(
     case_when(
@@ -613,7 +577,6 @@ Expmonth <- function (mIn) {
 #' mostly to store files in an Oracle database
 #' parameters are:
 #' file_path = path + filename to the file to read
-
 read_file_bytes <- function(file_path) {
   # 1. Get the file size
   file_info <- file.info(file_path)
@@ -635,19 +598,45 @@ read_file_bytes <- function(file_path) {
   return(byte_array)
 }
 
+#' function to check if a character(string?) can be an integer value
+#' parameters are:
+#' chr = string to test if it can represent an integer/number
 can_be_integer <- function(chr) {
   # Check if coercion to numeric results in NA
   !is.na(suppressWarnings(as.numeric(chr)))
 }
 
+
+#' function to extract the occurance of a value from a dataframe column - used in figuring out what a date is
+#' parameters are:
+#' df = the dataframe holding the date in question
+#' val = the value we are looking for
+#' frst = boolean - to limit the check to the first occasion (maybe?)
+PurgeDte <- function(df, val, frst){
+  if(frst) {
+    df$d2[df$delim %notin% c('E','U','')] <- 1
+  }
+  df$d1[df$delim %notin% c('E','U','')] <- nchar(df$dte[df$delim %notin% c('E','U','')])
+  df$dte[df$delim %notin% c('E','U','') & df$d2 != 0] <- str_remove(df$dte[df$delim %notin% c('E','U','') & df$d2 != 0],val)
+  df$d2[df$delim %notin% c('E','U','') & df$d2 != 0] <- nchar(df$dte[df$delim %notin% c('E','U','') & df$d2 != 0])
+  df$d2[df$d1 > df$d2] <- 0
+  return(df)
+}
+
+#' function to check and fix if necessary the date formats in an adjust csv file
+#' paramters are:
+#' adj_df = the adjust csv file loaded into a dataframe
+#' CSVfilename = the name of the adjust file
 fixAdjDates <- function(adj_df, CSVfilename){
-
+  # get the year and month of the adjust file
   dfDate <- GetYearMonth(adj_df)
+  # add row numbers
   adj_df$rownumber <- seq.int(nrow(adj_df))
-
+  # parse out the year and month
   yr <- year(dfDate)
   mn <- month(dfDate)
   message(dfDate)
+  # figure out the delimiter in use for each row of the datefished column
   df <- adj_df %>%
     mutate(
       delim = case_when(
@@ -657,6 +646,7 @@ fixAdjDates <- function(adj_df, CSVfilename){
         TRUE ~ "U" # Default value if none of the above conditions are met
       )
     )
+  # set the delim to "U" when it isn't a real date - blank or did not fish
   df <- df %>%
     mutate(
       delim = case_when(
@@ -668,6 +658,7 @@ fixAdjDates <- function(adj_df, CSVfilename){
       )
     )
 
+  # set up the dataframe for day of month extraction
   df$d1 <- 0
   df$d2 <- 0
   df$dte <- ""
@@ -675,17 +666,20 @@ fixAdjDates <- function(adj_df, CSVfilename){
   df$original_datefished <-  df$datefished
   df$dte[df$delim != 'E'] <- df$datefished[df$delim != 'E']
 
-
+  # Find and remove the year as a 4 digit number - 2025
   df <- PurgeDte(df, as.character(yr), TRUE)
+  # find and remove the year as a 2 digit number - 25
   df <- PurgeDte(df, substr(yr, nchar(yr) - 1, nchar(yr)), FALSE)
+  # find and remove the month as a full month name - September
   df <- PurgeDte(df, month.name[mn], TRUE)
+  # find and remove the month name as an abbreviation - Sept
   df <- PurgeDte(df, month.abb[mn], FALSE )
+  # find and remove the month as a 2 digit month number - 09
   df <- PurgeDte(df, paste0('0', mn), FALSE)
+  # find and remove the month as a 1 or 2 digit character number 9 or 12
   df <- PurgeDte(df, as.character(mn), FALSE)
 
-
-  #df$dte[df$delim %notin% c('','E') ] <- as.integer(trimws(str_remove_all(df$dte[df$delim %notin% c('','E')],df$delim[df$delim %notin% c('','E')]))
-
+  # remove the delimeters from the date should leave just the day of month
   df$dte[df$delim %notin% c('','E') ] <- trimws(str_remove_all(df$dte[df$delim %notin% c('','E')],df$delim[df$delim %notin% c('','E')]))
   df <- df %>%
     mutate(
@@ -693,21 +687,28 @@ fixAdjDates <- function(adj_df, CSVfilename){
         (delim %notin% c('','E') & can_be_integer(dte) == TRUE) ~ dte,
         .default = "0")
     )
-
+  # fix excel dates - days since 1899-12-30
   df$dfished[df$delim == 'E'] <- as.Date(as.numeric(df$datefished[df$delim == 'E']), origin = "1899-12-30")
+  # use the day of month remaining to build a date with the known year and month
   df$dfished[df$delim %notin% c("E","")] <- parse_date_time(paste0(yr,"-",mn,"-",df$dte[df$delim %notin% c("E","")]), order = c("ymd"), quiet = TRUE)
   df$dfished[df$delim == ""] <- NA
   df$datefished <- as.Date(df$dfished)
-  #browser()
+
+  # rename licence_id to surveykey if found
   if ("licence_id" %in% names(df)){
     df <- df %>% dplyr::rename(surveykey = licence_id)
   }
+  # pull the records with no delim and a NA for datefished - selecting a few key columns to identify a the issue
   tdf <- df[df$delim != '' & is.na(df$datefished), c("rownumber","surveykey","datefished","delim", "original_datefished")]
-  if (CSVfilename != '') {
-    if (file.exists(CSVfilename)) {
-      file.remove(CSVfilename)
-    }
-  }
+
+  # this seems to delete the CSV file we were using. Not sure about this.  Maybe an artifact of shiny loading?
+  # I am going to remove this with comments
+  # if (CSVfilename != '') {
+  #   if (file.exists(CSVfilename)) {
+  #     file.remove(CSVfilename)
+  #   }
+  # }
+  # if there where dates not able to sort out then show them as an html in a new window
     if (nrow(tdf)>0) {
       df <- df[0,]
       print(tdf)

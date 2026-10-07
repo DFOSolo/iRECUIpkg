@@ -2,10 +2,18 @@
 % Please edit documentation in R/common_Code.R
 \name{checkDate}
 \alias{checkDate}
-\title{check to see what a date format is}
+\title{check to see what a date format is
+parameters are:
+dteA = list of potential dates
+year = year value to check for
+month = month value to check for}
 \usage{
 checkDate(dteA, year, month)
 }
 \description{
 check to see what a date format is
+parameters are:
+dteA = list of potential dates
+year = year value to check for
+month = month value to check for
 }

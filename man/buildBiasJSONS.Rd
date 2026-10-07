@@ -2,10 +2,18 @@
 % Please edit documentation in R/Bias_KREST.R
 \name{buildBiasJSONS}
 \alias{buildBiasJSONS}
-\title{function to create a JSON dat packet that KREST can injest}
+\title{function to create a JSON dat packet that KREST can injest
+parameters are:
+rslt = the dataframe that buildData constructs
+lic_str = the name of the bias correction data
+csv_file = the name of the csv file that held the source bias correction factors}
 \usage{
 buildBiasJSONS(rslt, lic_str, csv_file)
 }
 \description{
 function to create a JSON dat packet that KREST can injest
+parameters are:
+rslt = the dataframe that buildData constructs
+lic_str = the name of the bias correction data
+csv_file = the name of the csv file that held the source bias correction factors
 }

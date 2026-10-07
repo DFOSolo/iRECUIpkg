@@ -2,10 +2,20 @@
 % Please edit documentation in R/common_Code.R
 \name{checkfld}
 \alias{checkfld}
-\title{check if a field exists and return its position}
+\title{check if a field exists and return its position
+parameters are:
+arry = the array to search
+sval = the item to search for
+srch = element to check rather than all the elements(maybe?)
+skippos = list of element positions to skip over}
 \usage{
 checkfld(arry, sval, srch, skippos)
 }
 \description{
 check if a field exists and return its position
+parameters are:
+arry = the array to search
+sval = the item to search for
+srch = element to check rather than all the elements(maybe?)
+skippos = list of element positions to skip over
 }

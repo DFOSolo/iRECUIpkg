@@ -3,11 +3,21 @@
 \name{Load_K_Bias}
 \alias{Load_K_Bias}
 \title{wrapper function to process a set of bias correction factors in CSV format as provided by the
-analysis tool}
+analysis tool
+bias corrections are stored as "estimates" but named so they can be easily identified
+parameters are:
+datapath = the path to the CSV file
+krestendpoint is a global variable of the destination KREST server
+logincreds is a global variable of the KREST login credentials to use}
 \usage{
-Load_K_Bias(datapath, dbDest)
+Load_K_Bias(datapath)
 }
 \description{
 wrapper function to process a set of bias correction factors in CSV format as provided by the
 analysis tool
+bias corrections are stored as "estimates" but named so they can be easily identified
+parameters are:
+datapath = the path to the CSV file
+krestendpoint is a global variable of the destination KREST server
+logincreds is a global variable of the KREST login credentials to use
 }
