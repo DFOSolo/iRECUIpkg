@@ -278,7 +278,7 @@ getandformatKData <- function(inds, xls_file, xls_path, SHEET_NAMES, source_id) 
   dec$DAYTYPE <-"Weekday"
 
 
-#### Do the sam efo rhte other 2 dataframe - cleaner if we did this in a loop before naming them maybe?
+#### Do the same for the other 2 dataframe - cleaner if we did this in a loop before naming them maybe?
   stv <- left_join(stv, months, by = "MONTH")
   stv <- left_join(stv, methods, by = c('method'="TEXT"))
   stv$DATATYPE <- stv$KREST_CDE

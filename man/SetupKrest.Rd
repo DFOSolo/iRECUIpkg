@@ -2,10 +2,14 @@
 % Please edit documentation in R/KREST_common.R
 \name{SetupKrest}
 \alias{SetupKrest}
-\title{function to initialize comms with the KREST api}
+\title{function to initialize comms with the KREST api
+parameters are:
+DestServer = the KREST endpoint we are working with}
 \usage{
 SetupKrest(DestServer)
 }
 \description{
 function to initialize comms with the KREST api
+parameters are:
+DestServer = the KREST endpoint we are working with
 }

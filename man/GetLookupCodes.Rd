@@ -2,7 +2,12 @@
 % Please edit documentation in R/KREST_common.R
 \name{GetLookupCodes}
 \alias{GetLookupCodes}
-\title{function to fetch look-up tables from KREST}
+\title{function to fetch look-up tables from KREST
+parameters are:
+BearerToken = the access token from getAuthToken
+resource = the lookup table in question
+dateTime = optional point in time selection
+showAssignementHistory = not realluy sure.  Maybe is supposed to return when a value was added?}
 \usage{
 GetLookupCodes(
   BearerToken,
@@ -13,4 +18,9 @@ GetLookupCodes(
 }
 \description{
 function to fetch look-up tables from KREST
+parameters are:
+BearerToken = the access token from getAuthToken
+resource = the lookup table in question
+dateTime = optional point in time selection
+showAssignementHistory = not realluy sure.  Maybe is supposed to return when a value was added?
 }

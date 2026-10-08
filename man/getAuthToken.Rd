@@ -4,6 +4,8 @@
 \alias{getAuthToken}
 \title{function to build and send the web call to the KREST server identified in the variable "krestendpoint"
 to get the authorization token - Token lives for about 10 mins
+tries many times to get a token as the server doesn't always respond in time
+code was traslated from the KREST helper api
 parameters are:
 krestendpoint = KREST server test vs prod
 Logincreds = structure passed to KREST contains username and password of KREST account to use
@@ -17,6 +19,8 @@ getAuthToken(krestendpoint, logincreds)
 \description{
 function to build and send the web call to the KREST server identified in the variable "krestendpoint"
 to get the authorization token - Token lives for about 10 mins
+tries many times to get a token as the server doesn't always respond in time
+code was traslated from the KREST helper api
 parameters are:
 krestendpoint = KREST server test vs prod
 Logincreds = structure passed to KREST contains username and password of KREST account to use

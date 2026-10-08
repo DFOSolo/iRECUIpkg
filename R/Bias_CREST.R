@@ -3,6 +3,7 @@
 #' datapath = path w/filename to the csv file containing the corrections
 #' dbDest = the designation of the destintion database be it "P" for OIOSP01 (prod) or "T" for OIOST01 (test)
 #'           or "D" for OISOD01 (dev)
+#' @export
 Load_C_Bias <- function (datapath, dbDest) {
   Ocon <- setupOracleConn(dbDest)
 

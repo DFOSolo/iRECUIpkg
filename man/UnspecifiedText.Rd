@@ -2,10 +2,12 @@
 % Please edit documentation in R/Common_UniformSav.R
 \name{UnspecifiedText}
 \alias{UnspecifiedText}
-\title{Convert SPSS labels to text}
+\title{this code is almost entirely Nick's  Just copied here to allow for converting EKOS to PRA data fromat
+Convert SPSS labels to text}
 \usage{
 UnspecifiedText
 }
 \description{
+this code is almost entirely Nick's  Just copied here to allow for converting EKOS to PRA data fromat
 Convert SPSS labels to text
 }

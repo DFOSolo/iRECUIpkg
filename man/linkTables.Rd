@@ -2,10 +2,18 @@
 % Please edit documentation in R/common_Code.R
 \name{linkTables}
 \alias{linkTables}
-\title{function to link look up tables to response data}
+\title{function to link look up tables to response data
+parameters are:
+survey_data = the response data in PRA format
+fullshellfish = boolean for clean up all the options for shellfishing as
+they have changed over time}
 \usage{
 linkTables(survey_data, fullshellfish)
 }
 \description{
 function to link look up tables to response data
+parameters are:
+survey_data = the response data in PRA format
+fullshellfish = boolean for clean up all the options for shellfishing as
+they have changed over time
 }

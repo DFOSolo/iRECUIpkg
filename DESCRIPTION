@@ -1,6 +1,6 @@
 Package: iRECUIpkg
 Title: RShiny User Interface For iREC Data Managment
-Version: 2026.10.07.1513
+Version: 2026.10.08.1600
 Authors@R: 
     person("Kristopher", "Hein", , "kristopher.hein@dfo-mpo.gc.ca", role = c("aut", "cre"))
 Description: UI for data management of the iREC program.

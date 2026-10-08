@@ -2,10 +2,18 @@
 % Please edit documentation in R/Estimates_KREST.R
 \name{LoadxlsxFromCREST}
 \alias{LoadxlsxFromCREST}
-\title{function to load an excel estimate as provided by the anaysis package}
+\title{function to load an excel estimate as provided by the analysis package
+that was previously stored in CREST
+parameters are:
+source_id = the source_id field of the table OTOLITH_V1.CREEL_IREC_SOURCE
+that we want to extract the xlsx file that was stored there and process and load it into KREST}
 \usage{
 LoadxlsxFromCREST(source_id)
 }
 \description{
-function to load an excel estimate as provided by the anaysis package
+function to load an excel estimate as provided by the analysis package
+that was previously stored in CREST
+parameters are:
+source_id = the source_id field of the table OTOLITH_V1.CREEL_IREC_SOURCE
+that we want to extract the xlsx file that was stored there and process and load it into KREST
 }
