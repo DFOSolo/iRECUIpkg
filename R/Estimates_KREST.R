@@ -3,7 +3,6 @@
 #' parameters are:
 #' xlsxFile = file with path to the excel file to read
 #' returns a named list of all the sheets
-
 read_all_sheets <- function(xlsxFile, ...) {
   sheet_names <- openxlsx::getSheetNames(xlsxFile)
   sheet_list <- as.list(rep(NA, length(sheet_names)))
@@ -14,17 +13,15 @@ read_all_sheets <- function(xlsxFile, ...) {
   return(sheet_list)
 }
 
-
 #' function to load a set of csv files into a list of dataframes
 #' 3 of the files will be "refreshed" from the CREST database if there is
 #' a known connection preexisting
 #' parameters are:
 #' none
 #' return a list of dataframes
-
 loadCSVs <- function() {
   cnt <- 0
-  csvs <- c("KrestAreaLookup.csv","CRESTItemLookup.csv", "KRESTMethodLookup.csv") #, "months.csv"
+  csvs <- c("KrestAreaLookup.csv","CRESTItemLookup.csv", "KRESTMethodLookup.csv")
   rslt <- as.list(rep(NA, length(csvs)+1))
   for (c in csvs) {
     cnt = cnt + 1
@@ -58,7 +55,6 @@ return(rslt)
 #'       it is only in the file name
 #' SHEET_NAMES = a list of the sheet(tabs) names to pull for the analysis
 #' source_id = the primary key of the record in the table OTOLITH_V1.CREEL_IREC_SOURCE to fetch the source excel file from
-
 loadXLSX_KREST <- function (xls_file,  xls_paths, inds,  SHEET_NAMES,  source_id) {
   rslt <- as.list(rep(NA, length(SHEET_NAMES)))
   # if the source_id = 0 pulling from filesystem file
@@ -199,7 +195,6 @@ loadXLSX_KREST <- function (xls_file,  xls_paths, inds,  SHEET_NAMES,  source_id
 #' rslt position three <- xls_file - the name of the file the estimates came from
 #' rslt position four <- csvs - the look-up tables used
 #' rslt position five <- St_est_g - The summary estimates with variance formatted for KREST
-
 getandformatKData <- function(inds, xls_file, xls_path, SHEET_NAMES, source_id) {
   # Load some look up tables we need to normalize the data against and make some adjustments for maybe tuna?
   # the order is important - probably should have been named, but also the order shouldn't need to change.
@@ -826,7 +821,6 @@ getandformatKData <- function(inds, xls_file, xls_path, SHEET_NAMES, source_id) 
 #'         we also break all those potentials out into their own fields
 #' dat_tbl = the data frame to work on
 #' returns dataframe with minimal id's and item/value pair
-
 norm_Data <- function(items, data_tbl){
   pattern <- paste(c('chinook','coho','halibut'), collapse="|") # a vector of species to force an estimate over
   # create a variable to hold the result
@@ -885,7 +879,6 @@ norm_Data <- function(items, data_tbl){
 #' inds = the components of the file name in the form Month_Year_... like "May_2026_Result_20260723_092514.xlsx"
 #' out_path_in = Optional-- the name of the path where we would write an xlsx form of the data that will form the individual
 #' data packets sent to KREST.
-
 buildJSONS <- function (rslt, inds, out_path_in = "") {
   # make sure there is some data to work with
   if (length(rslt) > 1) {
@@ -1029,7 +1022,6 @@ buildJSONS <- function (rslt, inds, out_path_in = "") {
 #' Jsons = the data frame of the estimates to send including a field containing the JSON string
 #' krestendpoint = the url of the destination server
 #' logincreds = the account credentials used to send the data to KREST
-
 SendJSON <- function(Jsons, krestendpoint, logincreds, krestroot) {
   # Check to see if we are running inside Shiny or not to determine where the progress goes
   if (length(shiny::getDefaultReactiveDomain()) > 0) {
@@ -1069,7 +1061,6 @@ SendJSON <- function(Jsons, krestendpoint, logincreds, krestroot) {
                     detail = paste("Loading ", Jsons$estname[[i]], ' ', stp, ' of ', tstps))
         stp = stp + 1
         auto_notify(Jsons$estname[[i]])
-        #clipr::write_clip(Jsons$bodyj[[i]])
         # double check the estimate name doesn't already exist
         SentD <- SendiRECD(krestendpoint, LoginToken, Jsons$g[[i]])
         # send the data
@@ -1098,7 +1089,6 @@ SendJSON <- function(Jsons, krestendpoint, logincreds, krestroot) {
 #' parameters are:
 #' est_name = the base name of the estimate to search for
 #' krestroot = the database we are interested in.
-
 setFilter <- function (est_name, krestroot) {
   # set a cookie identifying the session id.  Should probably make this dynamic, but it hasn't caused any troubles as of yet.
   cookies = c(ASP.NET_SessionId = "gy5gsj2w13dvgqxajfjniia1")
@@ -1145,7 +1135,6 @@ setFilter <- function (est_name, krestroot) {
 #' the filter set is based on what was previously sent by the setFilter function.
 #' parameters are:
 #' krestroot = the database url we are interested in.
-
 FetchGrid <- function (krestroot) {
   # set a cookie identifying the session id.  Should probably make this dynamic, but it hasn't caused any troubles as of yet.
   cookies = c(ASP.NET_SessionId = "gy5gsj2w13dvgqxajfjniia1")
@@ -1202,7 +1191,6 @@ FetchGrid <- function (krestroot) {
 #' parameters are:
 #' est_id = the internal KREST estimate ID
 #' krestroot = the database url we are interested in.
-
 deleteEst <- function(est_id, krestroot) {
 
   # set a cookie identifying the session id.  Should probably make this dynamic, but it hasn't caused any troubles as of yet.
@@ -1249,7 +1237,6 @@ deleteEst <- function(est_id, krestroot) {
 #' krestroot = the database url we are interested in.
 #' returns either false if no estimate name matches
 #' else returns the internal KREST id for the first estimate matching that name.
-
 checkEstExists <- function(estname, krestroot) {
   # set the filter
   setFilter(estname, krestroot)
@@ -1280,7 +1267,6 @@ checkEstExists <- function(estname, krestroot) {
 #' krestendpoint = the KREST url
 #' authToken = and authorization token from KREST
 #' GUID the GUID of the estimate to delete
-
 SendiRECD  <- function(krestendpoint, authToken, guid) {
  # set up the web call headers
   headers = c(
@@ -1300,15 +1286,10 @@ SendiRECD  <- function(krestendpoint, authToken, guid) {
   json <- content(res, type="application/json")
   # take a look at the returned value to see if an error occured
   if (!grepl('Sequence contains no matching element', rlst)) {
-    #browser()
     if (!is.null(json$results[[1]]$errorMessages)){
       auto_notify(paste0('Import ',json$results[[1]]$errorMessages))
     }
-#    auto_notify(rlst)
   }
-  # if (!grepl('Sequence contains no matching element',json$results[[1]]$errorMessages)){
-  #   auto_notify(json$results[[1]]$errorMessages)
-  # }
   return(json)
 }
 
@@ -1317,7 +1298,6 @@ SendiRECD  <- function(krestendpoint, authToken, guid) {
 #' krestendpoint = the KREST url
 #' authToken = and authorization token from KREST
 #' bodyj = the JSON data packet to send
-
 SendiRECP  <- function(krestendpoint, authToken, bodyj) {
 
   headers = c(
@@ -1332,7 +1312,7 @@ SendiRECP  <- function(krestendpoint, authToken, bodyj) {
   request.Resource = "/southcoast/importEstimate"
 
   urls <- paste0(krestendpoint,request.Resource)
-  #browser()
+
   res <- httr::POST(
     url = urls,
     body = bodyj2,
@@ -1355,7 +1335,6 @@ SendiRECP  <- function(krestendpoint, authToken, bodyj) {
 #' krestendpoint = the KREST url
 #' authToken = and authorization token from KREST
 #' GUID the GUID of the estimate to delete
-
 SendiRECPro  <- function(krestendpoint, authToken, guid) {
 
   headers = c(
@@ -1393,7 +1372,6 @@ SendiRECPro  <- function(krestendpoint, authToken, guid) {
 #' parameters are:
 #' estname = the base of the estimate name
 #' krestroot = the KREST url
-
 purgeEstWoptions <- function(estname, krestroot) {
   nme <- strsplit(estname, '-')[[1]][1]
   if(nchar(nme) >= 12){
@@ -1426,20 +1404,29 @@ Load_K_Ests <- function(xls_path, xls_file, source_id, session) {
   return(rws)
 }
 
-#' function to load an excel estimate as provided by the anaysis package
-
+#' function to load an excel estimate as provided by the analysis package
+#' that was previously stored in CREST
+#' parameters are:
+#' source_id = the source_id field of the table OTOLITH_V1.CREEL_IREC_SOURCE
+#' that we want to extract the xlsx file that was stored there and process and load it into KREST
+#' @export
 LoadxlsxFromCREST <- function (source_id) {
+  # fetch the record with the data we want
   d <- getdata(Kcon,
                paste0("select * from otolith_v1.creel_irec_source where source_id = ", source_id))
+  # write the out a zip file with the xlsx stored in it
   tmpfile <- tempfile(fileext = ".zip")
   writeBin(d$DATA[[1]], tmpfile)
+  # unzip the file
   extracted_path <- unzip(tmpfile, files = d$FILENAME[[1]], exdir = tempdir())
+  # read all(?) of the sheets in the xlsx file into a list of data frames
   sheet_names <- openxlsx::getSheetNames(extracted_path)
   sheet_list <- as.list(rep(NA, length(sheet_names)))
   names(sheet_list) <- sheet_names
   for (sn in sheet_names) {
     sheet_list[[sn]] <- openxlsx::read.xlsx(extracted_path, sheet = sn)
   }
+  # clean up the temp files
   file.remove(tmpfile)
   file.remove(extracted_path)
   return(sheet_list)

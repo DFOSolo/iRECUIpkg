@@ -732,20 +732,24 @@ fixAdjDates <- function(adj_df, CSVfilename){
 }
 
 #' function to link look up tables to response data
-
+#' parameters are:
+#' survey_data = the response data in PRA format
+#' fullshellfish = boolean for clean up all the options for shellfishing as
+#'                 they have changed over time
 linkTables <- function(survey_data, fullshellfish) {
-
+ # if we are running in shiny then we are running as a package so load the csv's from the package location
   ctx_session <- shiny::getDefaultReactiveDomain()
   if (!is.null(ctx_session)) {
     data_pathA <- system.file("extdata", "AreasDFO.csv", package = "iRECUIpkg")
     data_pathM <- system.file("extdata", "Methods.csv", package = "iRECUIpkg")
     data_pathS <- system.file("extdata", "shellfishing.csv", package = "iRECUIpkg")
   } else {
+    # not runnig as a package so full path to csv's is needed
     data_pathA <- "inst\\extdata\\AreasDFO.csv"
     data_pathM <- "inst\\extdata\\Methods.csv"
     data_pathS <- "inst\\extdata\\shellfishing.csv"
   }
-
+  # load the csv's
   areas_df <- read.csv(data_pathA)
   methods_df <- read.csv(data_pathM)
   ccp_df <- read.csv(data_pathS)
@@ -755,26 +759,28 @@ linkTables <- function(survey_data, fullshellfish) {
 
   # change NA's to 0's for numeric cells
   df1 <- df1 |> mutate(across(where(is.numeric), ~replace_na(., 0)))
-
+  # join the areas table
   df1 <- df1 %>% left_join(areas_df, join_by("AREA"=="TEXT"))
   names(df1)[names(df1)=='AREA'] <- 'AREASCODE'
   names(df1)[names(df1)=='TYPE_NAME'] <- 'AREA'
-
+  # join the methods table
   df1 <- df1 %>% left_join(methods_df, join_by("METHOD"=="TEXT"))
   names(df1)[names(df1)=='METHOD'] <- 'METHODCODE'
   names(df1)[names(df1)=='KREST_CDE'] <- 'METHOD'
-
+  # make sure at least checkcrabsprawns is in the dataset
   if (!"CHECKCRABSPRAWNS" %in% names(df1)) {
     df1$CHECKCRABSPRAWNS <- NA
   }
   if (fullshellfish) {
-    #browser()
+    # drop labels if they are present
     if (haven::is.labelled(df1$CHECKCRABSPRAWNS)){
       df1 <- haven::zap_labels(df1, user_na = TRUE)
     }
+    # make the checkcrabsprawns a character column
     if (class(df1$CHECKCRABSPRAWNS) != "character") {
       df1$CHECKCRABSPRAWNS <- as.character(df1$CHECKCRABSPRAWNS)
     }
+    # join the check crabs prawns look up
     df1 <- df1 %>% left_join(ccp_df, join_by("CHECKCRABSPRAWNS"=="VALUE"))
     df1$CheckCrabsPrawnsTXT <- df1$CHECKCRABSPRAWNS
     names(df1)[names(df1)=='TEXT'] <- 'CHECKCRABSPRAWNS_TXT'
@@ -783,8 +789,7 @@ linkTables <- function(survey_data, fullshellfish) {
     names(df1)[names(df1)=='CHECKCRABSPRAWNS'] <- 'CHECKCRABSPRAWNS_TXT'
     names(df1)[names(df1)=='VALUE'] <- 'CHECKCRABSPRAWNS'
   }
-  #browser()
-
+  # sort out the center of fishing from the old stype to the new style
   if (!"CRAB_CENTREOFFISHING_LATITUDE" %in% names(df1)) {
     if ("CENTREOFFISHING_LATITUDE" %in% names(df1)){
       df1 <- df1 %>%

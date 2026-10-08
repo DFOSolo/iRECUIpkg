@@ -1,22 +1,4 @@
 
-
-#' wrapper function to load response data into KREST
-Write_K_Responses <- function(sourcepath, destpath, datapath, datafile, yr_name) {
-  df_read <- read_sav(paste0(datapath,"\\",datafile))
-  dte <- mean(df_read[!is.na(df_read$DateFished),]$DateFished)
-  yr <- year(dte)
-  mnth_str <- months.Date(dte)
-
-  if (mnth_str %in% c('January', 'February', 'March')) {
-    yr_name <- paste0(as.numeric(yr) - 1, '-' , as.numeric(substr(yr, 3, 4)))
-  } else {
-    yr_name <- paste0(yr, '-' , as.numeric(substr(yr, 3, 4)) + 1)
-  }
-  print(paste0("mnth_str = ", mnth_str))
-
-  Write_K_ResponsesIn(sourcepath, destpath, datapath, datafile, yr_name, df_read)
-}
-
 #' wrapper function to load response data into KREST
 #' @export
 Write_K_ResponsesIn <- function(sourcepath, destpath, datapath, datafile, yr_name, df_read) {
@@ -445,19 +427,6 @@ write_K_ExcludesIn <- function (destpath, exc_path, exc_file, exc_df, yr_name){
     browseURL(outfile)
   }
 
-}
-
-
-PurgeDte <- function(df, val, frst){
-  #browser()
-  if(frst) {
-    df$d2[df$delim %notin% c('E','U','')] <- 1
-  }
-  df$d1[df$delim %notin% c('E','U','')] <- nchar(df$dte[df$delim %notin% c('E','U','')])
-  df$dte[df$delim %notin% c('E','U','') & df$d2 != 0] <- str_remove(df$dte[df$delim %notin% c('E','U','') & df$d2 != 0],val)
-  df$d2[df$delim %notin% c('E','U','') & df$d2 != 0] <- nchar(df$dte[df$delim %notin% c('E','U','') & df$d2 != 0])
-  df$d2[df$d1 > df$d2] <- 0
-  return(df)
 }
 
 testing <- function() {

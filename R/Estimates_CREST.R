@@ -8,7 +8,9 @@
 #' @export
 Load_C_Ests <- function(xls_pathIn, xls_fileName, dbDest, session) {
   auto_notify("Setting things up")
-
+      # checking to see if the xls file is present with its correct name or if it is from a
+      # shiny upoad - shiny names the files like 0.xlsx
+      # if it is a shiny upload, rename the file to its proper name
      if (utils::file_test( "-f", xls_pathIn)) {
        file.rename(xls_pathIn, paste0(dirname(xls_pathIn), '\\', xls_fileName))
        xls_file <- xls_fileName
@@ -17,7 +19,7 @@ Load_C_Ests <- function(xls_pathIn, xls_fileName, dbDest, session) {
        xls_file <- xls_fileName
        xls_path <- xls_pathIn
      }
-
+   # check to see if the path ends with a directory break
    if (!grepl("[/\\\\]$", xls_path)) {
      xls_path <- paste0(xls_path,"/")
    }
@@ -59,7 +61,6 @@ Load_C_Ests <- function(xls_pathIn, xls_fileName, dbDest, session) {
 #' xls_file = the xlsx file name
 #' SHEET_NAMES = a list of named tabs in the XLSX file to load
 #' returns a list of data frames named for the xlsx tab
-
 loadXLSX_CREST <- function (xls_path, xls_file, SHEET_NAMES) {
   fn <- paste0(xls_path, xls_file)
   sheet_list <- as.list(rep(NA, length(SHEET_NAMES)))
@@ -85,7 +86,6 @@ loadXLSX_CREST <- function (xls_path, xls_file, SHEET_NAMES) {
 #' represent
 #' src_id = the primary key of the creel_irec_source table where the xlsx file is stored
 #' dbCon = an oracle connection to the database destination
-
 formatdata <- function(dfs, SHEET_NAMES, inds, src_id, dbCon) {
   # list of look up tables to load from CREST to link to the source data for codes
   lu_tbls <- c(
@@ -378,7 +378,6 @@ formatdata <- function(dfs, SHEET_NAMES, inds, src_id, dbCon) {
 #' parameters are:
 #' rslts = list containing the 4 tables creel_irec_Est, creel_irec_value, creel_irec_var, creel_irec_var_value
 #' Crestcon = oracle connection
-
 SendToCREST <- function(rslts, Crestcon){
 
   result <- tryCatch({
@@ -411,7 +410,6 @@ SendToCREST <- function(rslts, Crestcon){
 #' datpath = path to the XLSX file to store
 #' yr_name = the name of the fiscal year the estimates are part of
 #' mnth_str = the name of the month the estimates are for
-
 StoreSource <- function (dbCon, datafile, datapath, yr_name, mnth_str){
 
   tryCatch(

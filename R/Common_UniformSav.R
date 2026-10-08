@@ -1,4 +1,7 @@
 
+#' this code is almost entirely Nick's  Just copied here to allow for converting EKOS to PRA data fromat
+
+
 #' Convert SPSS labels to text
 #'
 UnspecifiedText <- "Unspecified"
@@ -105,7 +108,7 @@ convertColTypes <- function(df, df_to_match) {
     summarize_all(class) %>%
     gather(col_name, col_type) %>%
     nest(data = -col_type)
-  
+
   for (colIdx in 1:nrow(col_types)) {
     type_name <- pull(col_types[colIdx, 1])
     col_names <-
@@ -138,7 +141,7 @@ convertColTypes <- function(df, df_to_match) {
       ))
     }
   }
-  
+
   return(df)
 }
 
@@ -386,11 +389,11 @@ loadPraSurveyResultsC <- function(survey_result,
   #   read_spss(survey_result_filename) %>%
   #   as_tibble() %>%
   #   select_all(tolower)
-  
+
   survey_result <- survey_result %>%
     as_tibble() %>%
     select_all(tolower)
-  
+
   survey_result_spp <-
     survey_result %>%
     select()
@@ -661,7 +664,7 @@ loadSurveyResults <- function(survey_result,
                               adjusts) {
 
   exclude_id <- c()
-  
+
   exclude_lic <- loadExcludeFile(excludes)
   if (!is.null(exclude_lic) && nrow(exclude_lic) > 0) {
     if ("licence_id" %in% colnames(exclude_lic)) {
@@ -695,10 +698,10 @@ loadSurveyResults <- function(survey_result,
      if ("comment" %notin% names(adjusts)) {
        adjusts$comment <- ""
      }
-     
+
      #KH July 14, 2026 -- Added so recent adjusts match old data format
-     
-     NclmnstoAdj <- names(survey_results) #c("month", "year", "day") 
+
+     NclmnstoAdj <- names(survey_results) #c("month", "year", "day")
      for (ncn in NclmnstoAdj) {
        cat(".")
        if(ncn %notin% names(adjusts)){
@@ -707,7 +710,7 @@ loadSurveyResults <- function(survey_result,
        }
      }
      #KH July 14, 2026
-     
+
      adjust <-
           loadSurveyAdjustments(adjusts) %>%
           convertColTypes(survey_results)
@@ -728,27 +731,3 @@ loadSurveyResults <- function(survey_result,
   return(survey_results)
 }
 
-muck <- function() {
-  s_df <- data.frame()
-exclude_lic_filename <- c()
-survey_adj_filename <- c()
-
-OsaveFileName <- "C:\\Users\\heink\\Documents\\Creel\\2024\\iREC\\01512FULL - August 1-31 Complete Data set.sav"
-NsaveFileName <- "C:\\Users\\heink\\Documents\\Creel\\2024\\iREC\\DFO_Monthly_Catch_Survey_April 2024_NoNewVariables_v1(p).sav"
-exclude_lic_id <- c("")
-# ekos_d <- loadEkosSurveyResults(OsaveFileName,exclude_lic_id)
-# pra_d <- loadPraSurveyResults(NsaveFileName, exclude_lic_id)
-
-exclude_lic_filename <- c()
-survey_adj_filename <- c()
-SurveyStartDate <- as.Date("2012-04-01")
-saveFileName <- read_sav(OsaveFileName)
-# %>%
-#   select_all(tolower)
-s_df <- loadSurveyResults(saveFileName, SurveyStartDate, exclude_lic_filename, survey_adj_filename)
-return(s_df)
-}
-
-
-# message("What!")
-# df <- muck()

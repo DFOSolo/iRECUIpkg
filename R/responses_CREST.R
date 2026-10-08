@@ -334,17 +334,21 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
 } else {
   df <- dfr
 }
-
+# fix common differences in what is delivered vs what is expected
  df1 <- fixValues(df)
+ # load look up tables for codes
  lus <- load_CR_lus()
-
+ # link the look ups get the needed ID codes
  df1 <- link_Lus(df1, lus)
+ # fix comments for length, emails and phone numbers
  df1 <- fixComments(df1)
+ # add the data type to the data if not present (older data?)
  if ("TYPE" %notin% names(df1)) {
    df1$TYPE <- paste0("iREC ", mnth_str, " ", yr)
  }
-
+ # pull only columns we need now
  df_filtered <- filterColumns(df1,c("LRG_AREA_ID_ID","METHOD_ID", "SHELLFISH_ID", "LODGE_ID", "GUIDED_ID", "FISHED_ID", "COMPLETESURVEY_ID", cols_to_keep_C))
+ # add row numbers for linking later
  df_filtered <- df_filtered %>%
    dplyr::mutate(TMP_ID = as.integer(row_number()), .before = 1)
  strataCols <- c('YEAR', 'MONTH', 'DAY', 'SURVEYKEY', 'LRG_AREA_ID_ID', 'METHOD_ID', 'LODGE_ID','GUIDED_ID',
@@ -357,22 +361,24 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
 }
 
   oth_cols <- c("DIDNOTFISH", "COMPLETESURVEY", "FISHEDFROMLODGE", "FISHEDWITHGUIDE", "CHECKCRABSPRAWNS","TYPE", "STARTDAY", "ENDDAY")
+  # pull the strat columns out
   df_filtered <- df_filtered[, !(names(df_filtered) %in% oth_cols)]
-
+  # pull the item type columns
    itmCols <- names(df_filtered)[!names(df_filtered) %in% c('TMP_ID',strataCols)]
 
  resp <- df_filtered[c('TMP_ID', strataCols)]
  df_itms <- df_filtered[,!names(df_filtered) %in% strataCols]
 
-
+ # pivot the item values so many rows with 1 item - value pair
  respV <- df_itms %>%
    pivot_longer(all_of(itmCols),names_to = "CAT",
                 values_to = "VALUE",
                 values_transform = list(VALUE = as.character))
+ # link the items we know of to get the ID code for each
  respVI <- respV %>% left_join(lus["CREEL_IREC_ITEM"][[1]], join_by("CAT"=="COLUMN_NAME"))
+ # look for items we don't know of
  respVB <- unique(respVI$CAT[is.na(respVI$ITEM_ID)])
-
-
+# if we find any, add them to the item table
  if (length(respVB > 0)) {
    itm_id <- dbGetQuery(Lcon,
                         "select max(item_id) as itm_id from otolith_v1.creel_irec_item")
@@ -386,9 +392,11 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
    }
    dbCommit(Ccon)
    lus <- load_CR_lus()
+   # try linking the item code table again.
    respVI <- respV %>% left_join(lus["CREEL_IREC_ITEM"][[1]], join_by("CAT"=="COLUMN_NAME"))
 
  }
+ # get a list of year/month combos to work through.  Really should only be 1
  mnths <- unique(resp[c('YEAR', 'MONTH')])
  mnths <- haven::zap_labels(mnths, user_na = TRUE)
  respSQL <- 'INSERT INTO otolith_v1.creel_irec_RESP (IREC_RESP_ID, YEAR, MONTH, DAY, LICENCE_ID, LRG_AREA_ID_ID, METHOD_ID_ID, LODGE_ID_ID, GUIDED_ID_ID, FISHED_ID_ID, COMPLETESURVEY_ID_ID,
@@ -399,8 +407,10 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  for (m in 1:nrow(mnths)) {
    yr <- mnths[m, "YEAR"]
    mnth <- mnths[m, "MONTH"]
+   # delete any existing item value data for that year/month combo.
    auto_notify(paste0("Clearing existing ", datatype, " values"))
    chunks <- 15000
+   # responses are unique to a set of year month values
    if (datatype == 'Response') {
      wsql <- paste0(
        "WHERE irec_resp_id_id IN
@@ -409,6 +419,7 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
      )
      tsql <- paste0("Delete from otolith_V1.creel_irec_resp_V ",  wsql, " and rownum <= ", chunks)
    } else if (datatype == 'Adjust') {
+     # there can be many adjusts for the same year/month, but they must be named uniquely, so clear them out based on the filename
      tsql <- paste0("select source_id from otolith_V1.creel_irec_Source where filename = :filename and data_type = '",  datatype,  "'")
      #browser()
      SRC_ID <- dbGetQuery(Ccon, tsql, list( filename = paste0(yr_name, ' - ', mnth_str, ' - iREC ', datatype, 's ', datafile)))[[1]]
@@ -419,7 +430,7 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
      )
      tsql <- paste0("Delete from otolith_V1.creel_irec_resp_V " , wsql, " and rownum <= ", chunks)
    }
-
+     # we delete them in chunks so we can see progress, otherwise it grinds on with no idea what is going on.
      trwsSQL <- paste0("Select count(*) as rws from otolith_v1.creel_irec_resp_v ", wsql)
      trws <- dbGetQuery(Ccon, trwsSQL)[[1]]
      rwls <- 1
@@ -441,6 +452,7 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
 
      auto_notify(paste0("Clearing existing ", datatype))
      chunks <- 1000
+     # do the same but for the response strata. In chunks to monitor progress
      if (datatype == 'Response') {
        WhereSQL <- paste0("WHERE irec_resp_id IN
                       (SELECT irec_resp_id FROM otolith_v1.creel_irec_resp r left join otolith_V1.creel_irec_source s on r.source_id_id = s.source_id
@@ -470,15 +482,18 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
      }
  }
 
-
+ # delete the source record
  tsql <- paste0("Delete from otolith_V1.creel_irec_Source where filename = :filename and data_type = '", datatype, "'")
  rslt <- ROracle::dbSendQuery(Ccon, tsql, list(filename = paste0(yr_name,' - ', mnth_str, ' - iREC ', datatype, 's ', datafile)))
  dbClearResult(rslt)
  dbCommit(Ccon)
  auto_notify(paste0("Processing ", datatype, " file for loading"))
+ # reuse the source_id if we had one, otherwise look one up
+ if (SRC_ID <- -999) {
  SRC_ID <- dbGetQuery(Ccon, "select max(source_id) + 1 as SRC_ID from otolith_V1.creel_irec_source")[[1]]
+ }
  RESP_ID <- dbGetQuery(Ccon, "select max(IREC_RESP_ID) as RESP_ID from otolith_V1.creel_irec_resp")[[1]]
-
+ # insert the source iD record
  sql <- "
   INSERT INTO OTOLITH_V1.CREEL_IREC_SOURCE
     (source_id, filename, data_type, description, label, date_added)
@@ -499,10 +514,10 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  rslt <- dbGetQuery(Ccon, sql, binds)
  # 5. Commit the changes
  dbCommit(Ccon)
-
+ # update it with the zipfile blob
  rslt2 <- dbGetQuery(Ccon, "update otolith_V1.creel_irec_source set data = :p_data where source_id = :SRC_ID", data2)
  dbCommit(Ccon)
-
+ # start getting the dataframe to match the columns in the database
  respTbl <- resp %>% dplyr::rename(
    IREC_RESP_ID = "TMP_ID",
    LICENCE_ID = "SURVEYKEY",
@@ -546,7 +561,7 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  respTbl$TOTALJUVENILES	 <- as.character(respTbl$TOTALJUVENILES)
  respTbl$CHECKCRAB_ID <- 0
  respTbl$CHECKPRAWN_ID <- 0
-
+ # we encrypt the email and names so someone can't stumble upon them
   data_path <- system.file("extdata", "sodium", package = "iRECUIpkg")
   load(file=data_path)
   K_nonce <- sodium::random(24)
@@ -561,7 +576,7 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
   respTbl$EMAIL <- lapply(respTbl$EMAIL, function(x){
     paste0(base64enc::base64encode(sodium::data_encrypt(serialize(x, NULL), K_key, K_nonce)), "#", base64enc::base64encode(K_nonce))
   })
-
+ # finish formatting the dataframe to match the database table
  if (datatype == 'Response') {
  respTbl <- respTbl[,c("IREC_RESP_ID",
                        "YEAR",
@@ -623,9 +638,6 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  }
  auto_notify(paste0("Writing ", datatype))
 
- # ROracle::dbWriteTable(con = Ccon, name = "CREEL_IREC_RESP", value = respTbl, append = TRUE, row.names = FALSE, schema = "OTOLITH_V1")
-
-
  if (length(shiny::getDefaultReactiveDomain()) > 0) {
    incProgress <- shiny::incProgress
    withProgress <- shiny::withProgress
@@ -635,12 +647,12 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  }
 
  withProgress(message = 'Processing ', value = 0, {
+   # write the data to the database in chunks so we can monitor the progress
    # Calculate chunks
    chunk_size <- 5000
    row_count <- nrow(respTbl)
    chunks <- split(respTbl, (seq_len(row_count) - 1) %/% chunk_size)
    # Set up a progress bar
-   #browser()
    pb <- progress_bar$new(total = length(chunks))
    # Write the first chunk to create/overwrite the table
    incProgress(1/ length(chunks), detail = paste("Loading", datatype, "Values  ", 1))
@@ -659,13 +671,9 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
 
  auto_notify(paste0("Done Writing ", datatype))
 
-
+ # do the same for the item values
   respV1 <- respVI[!is.na(respVI$VALUE) & respVI$VALUE != 0, ] %>%
     dplyr::mutate(TMPV_ID = as.integer(row_number()), .before = 1)
-
- #respV1 <- respVI[!is.na(respVI$VALUE), ] %>%
- #  dplyr::mutate(TMPV_ID = as.integer(row_number()), .before = 1)
-
 
  respVITbl <- respV1[, c("TMPV_ID", "TMP_ID", "ITEM_ID", "VALUE", "TEXT")]
  respVITbl$TMP_ID <- respVITbl$TMP_ID + RESP_ID
@@ -677,9 +685,6 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
                                      IREC_RESP_ID_ID = "TMP_ID",
                                      ITEM_ID_ID = "ITEM_ID")
  auto_notify(paste0("Writing ", datatype, " values"))
-
- # ROracle::dbWriteTable(con = Ccon, name = "CREEL_IREC_RESP_V", value = respVITbl, append = TRUE, row.names = FALSE, schema = "OTOLITH_V1")
- # auto_notify(paste0("Done writing ", datatype, " values"))
 
  if (length(shiny::getDefaultReactiveDomain()) > 0) {
    incProgress <- shiny::incProgress
@@ -695,7 +700,6 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
  row_count <- nrow(respVITbl)
  chunks <- split(respVITbl, (seq_len(row_count) - 1) %/% chunk_size)
  # Set up a progress bar
- #browser()
  pb <- progress_bar$new(total = length(chunks))
  # Write the first chunk to create/overwrite the table
  incProgress(1 / length(chunks), detail = paste("Loading", datatype, "Values  ", 1))
@@ -714,18 +718,6 @@ if (SurveyStartDate < PraStartDate & datatype == "Response") {
 
  dbCommit(Ccon)
  return(TRUE)
-}
-
-#' function to filter response dataset based on list of column names
-filterRespColumns <- function(survey_data, cols) {
-
-  df1 <- survey_data
-  for (item in cols) {
-    names(df1)[names(df1)==tolower(item)] <- item
-  }
-
-  return(df1[, names(df1) %in% cols])
-
 }
 
 #' function to load look-ups from CREST to aid in formatting response data for loading into CREST
