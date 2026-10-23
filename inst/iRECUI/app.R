@@ -601,9 +601,11 @@ server <- function(input, output, session) {
     df <- read_sav(inFile$datapath)
     auto_notify("Read SAV")
     flagged_df <- iRECUIpkg::flagged_8s(df)
+    Dups <- FiltersyResponses(df)
+
     n_dfs <- processSav(df,xlsFile,input$HABAG, input$CNBAG, input$COBAG, input$ENCLIMIT, input$ANN_CN,input$ANN_LC, input$ANN_HA, excludes, adjusts,input$Areacheckbox, input$FRIScheckbox, input$FRIS_GRACE)
     auto_notify("Processed SAV")
-    wrkbk <<- buildOutlierXLS(n_dfs, flagged_df)
+    wrkbk <<- buildOutlierXLS(n_dfs, flagged_df, Dups)
     rtn_lst = list("responses" = n_dfs$responses,
                    "annual" = n_dfs$annual,
                    "areaD" = n_dfs$areaD,

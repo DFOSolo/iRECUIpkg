@@ -134,11 +134,12 @@ order by cast(pfma as number), species")
 #' n_dfs = list of dataframes returned from processSav
 #' flagged_df = dataframe returned from crazy8's code
 #' @export
-buildOutlierXLS <- function(n_dfs,flagged_df){
+buildOutlierXLS <- function(n_dfs,flagged_df, Dups_df){
   auto_notify("create Work Book")
   wrkbk = openxlsx::createWorkbook() #type = 'xlsx'
   auto_notify("Catch Outliers")
   auto_notify("Create Sheet Catch Outliers")
+  options("openxlsx.dateFormat" = "yyyy-mm-dd")
   openxlsx::addWorksheet(wrkbk,"Catch Outliers")
   openxlsx::writeData(wrkbk, "Catch Outliers", n_dfs$catch, startCol = 1, rowNames = FALSE)
   auto_notify("add data frame Catch outliers")
@@ -166,6 +167,101 @@ buildOutlierXLS <- function(n_dfs,flagged_df){
 
   openxlsx::addWorksheet(wrkbk,"Crazy 8s")
   openxlsx::writeData(wrkbk, "Crazy 8s", flagged_df, startCol = 1, rowNames = FALSE)
+
+  sheet_name <- ""
+#  openxlsx::addWorksheet(wrkbk, sheet_name)
+  title_style  <- createStyle(textDecoration = "bold", fontSize = 14)
+  header_style <- createStyle(textDecoration = "bold", fontColour = "#FFFFFF", fgFill = "#4F81BD")
+  zebra_style1  <- createStyle(fgFill = "#F2F2F2")
+  zebra_style2  <- createStyle(fgFill = "#FFFFFF")
+
+  current_row <- 1
+  row_buffer <- 5 # Space between tables
+  df_cnt <- 0
+
+
+  for (df_name in names(Dups_df)) {
+    df <- Dups_df[[df_name]]
+    sheetname2 <- substr(paste0(sheet_name, " ", df_name), 1, 31)
+    openxlsx::addWorksheet(wrkbk,sheetname2)
+    # --- Step A: Write and format the Table Title ---
+    writeData(
+      wrkbk,
+      sheet = sheetname2,
+      x = df_name,
+      startRow = current_row,
+      startCol = 1
+    )
+    addStyle(
+      wrkbk,
+      sheet = sheetname2,
+      style = title_style,
+      rows = current_row,
+      cols = 1
+    )
+
+    # Advance row to leave 1 blank line below the title
+    #current_row <- current_row + 2
+
+    # --- Step B: Write the Data Frame ---
+    # Keep track of where this specific table's header and data rows are
+    header_row <- current_row
+    data_start <- header_row + 1
+    data_end   <- header_row + nrow(df)
+
+    writeData(
+      wrkbk,
+      sheet = sheetname2,
+      x = df,
+      startRow = header_row,
+      startCol = 1, name = df_name
+    )
+
+    # --- Step C: Apply Table Styling ---
+    # 1. Bold header with a colored background
+    addStyle(
+      wrkbk,
+      sheet = sheetname2,
+      style = header_style,
+      rows = header_row,
+      cols = 1:ncol(df),
+      gridExpand = TRUE
+    )
+
+    # 2. Alternating row colors (zebra striping on even rows)
+
+    # if(data_start < data_end) {
+    # even_rows <- seq(from = data_start, to = data_end, by = 2)
+    # if (length(even_rows) > 0) {
+    #   addStyle(
+    #     wrkbk,
+    #     sheet = sheet_name,
+    #     style = zebra_style1,
+    #     rows = even_rows,
+    #     cols = 1:ncol(df),
+    #     gridExpand = TRUE
+    #   )
+    # }
+    # odd_rows <- seq(from = data_start + 1, to = data_end, by = 2)
+    # if (length(even_rows) > 0) {
+    #   addStyle(
+    #     wrkbk,
+    #     sheet = sheet_name,
+    #     style = zebra_style2,
+    #     rows = even_rows,
+    #     cols = 1:ncol(df),
+    #     gridExpand = TRUE
+    #   )
+    # }
+    #
+    # }
+    #
+    # Advance the row pointer for the next dataset loop
+    #current_row <- data_end + row_buffer
+  }
+  #setColWidths(wrkbk, sheet = sheet_name, cols = 1:5, widths = "auto")
+
+  #openxlsx::writeData(wrkbk, "Duplicate Catches", Dups_df, startCol = 1, rowNames = FALSE)
 
   openxlsx::addWorksheet(wrkbk,"FRIS Limits")
   openxlsx::writeData(wrkbk, "FRIS Limits", n_dfs$fris, startCol = 1, rowNames = FALSE)

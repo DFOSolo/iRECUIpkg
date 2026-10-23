@@ -7,7 +7,7 @@ parameters are:
 n_dfs = list of dataframes returned from processSav
 flagged_df = dataframe returned from crazy8's code}
 \usage{
-buildOutlierXLS(n_dfs, flagged_df)
+buildOutlierXLS(n_dfs, flagged_df, Dups_df)
 }
 \description{
 function to build an XLSX file from the output of the function processSav and crazy8s
