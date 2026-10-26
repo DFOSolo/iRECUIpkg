@@ -2,10 +2,12 @@
 % Please edit documentation in R/Filters y responses.R
 \name{FiltersyResponses}
 \alias{FiltersyResponses}
-\title{Don't need to do this as we are getting the data from the SAV file not excel}
+\title{function to process the iREC sav file looking for duplicate records
+parameters are:}
 \usage{
 FiltersyResponses(Dataset)
 }
 \description{
-Don't need to do this as we are getting the data from the SAV file not excel
+function to process the iREC sav file looking for duplicate records
+parameters are:
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Outlier_Main.R
 \name{processSav}
 \alias{processSav}
-\title{function to process the iREC sav file as delivered by th econtractor
+\title{function to process the iREC sav file as delivered by the contractor
 parameters are:
 SavDat = Name (and path?) to the .sav file
 xlsFile = Name of the output XLSX file - THis might be a bit of legacy?
@@ -37,7 +37,7 @@ processSav(
 )
 }
 \description{
-function to process the iREC sav file as delivered by th econtractor
+function to process the iREC sav file as delivered by the contractor
 parameters are:
 SavDat = Name (and path?) to the .sav file
 xlsFile = Name of the output XLSX file - THis might be a bit of legacy?

@@ -1,5 +1,7 @@
 # IMPORT (READ EVERYTHING AS TEXT)
-
+#' function to process the iREC sav file looking for duplicate records
+#' parameters are:
+#' @export
 FiltersyResponses <- function(Dataset) {
 
 # HALIBUT LENGTH (KEEP "UN")
@@ -50,7 +52,7 @@ date_cols <- c(
   "datecompleted"
 )
 
-#' Don't need to do this as we are getting the data from the SAV file not excel
+#  Don't need to do this as we are getting the data from the SAV file not excel
 
 # Dataset <- Dataset %>%
 #   mutate(
@@ -111,11 +113,6 @@ Duplicate_reports <- Complete %>%
   ungroup() %>%
   arrange(across(all_of(dup_cols)))
 
-
-# EXPORT
-
-
-#export
 
 #dir.create("salida", showWarnings = FALSE)
 
