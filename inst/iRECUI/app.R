@@ -7,7 +7,6 @@
   library(dipsaus, warn.conflicts = FALSE)
   library(anytime, warn.conflicts = FALSE)
   library(dipsaus, warn.conflicts = FALSE)
-  library(dplyr, warn.conflicts = FALSE)
   library(DT, warn.conflicts = FALSE)
   library(glue, warn.conflicts = FALSE)
   library(haven, warn.conflicts = FALSE)
@@ -130,6 +129,11 @@ ui <- navbarPage(
             "FRIScheckbox",
             "Use FRIS Data for Daily Bag Limits",
             FALSE
+          ),
+          checkboxInput(
+            "Consolecheckbox",
+            "Open Console Window",
+            TRUE
           )
 
         ),
@@ -233,13 +237,26 @@ ui <- navbarPage(
   # ********************** UI for quering database Start ************************
   tabPanel("Query Tool",
            useShinyjs(),
+           sidebarPanel(
+             # The sliderTextInput allows character vectors
+             sliderTextInput(
+               inputId = "source_slider",
+               label = "Select Source Database:",
+               choices = c("KREST", "CREST" ),
+               selected = "CREST",
+               grid = TRUE
+             )
+           ),
+
            mainPanel(
              fluidRow(
                column(2,selectInput("Qyrsel", "Select Year", choices = c("None"="", last5yrs), multiple = TRUE, selected = format(Sys.Date(),"%Y")),actionButton("clearQYRBtn", "Clear Selection")),
                column(2,selectInput("Qmnthsel", "Select Month", choices = c("None"="","All",month.name), multiple = TRUE, selected = "All"),actionButton("clearQMNTBtn", "Clear Selection")),
                column(2,selectInput("QAreasel", "Select Areas", choices = c("None"="","All", unique(Qareas_df$type_name)), multiple = TRUE, selected = "All"),actionButton("clearQAREABtn", "Clear Selection")),
                column(3,selectInput("Qsppgrpsel", "Select Species Group", choices = c("None"="","All", unique(df_spp$GROUPING)), multiple = TRUE, selected = "All"),actionButton("clearQSPPGBtn", "Clear Selection")),
-               column(3,selectInput("Qsppsel", "Select Species", choices = c("None"="","All", unique(df_spp$COMMON_NAME)), multiple = TRUE, selected = "All"),actionButton("clearQSPPBtn", "Clear Selection"))
+               column(3,selectInput("Qsppsel", "Select Species", choices = c("None"="","All", unique(df_spp$COMMON_NAME)), multiple = TRUE, selected = "All"),actionButton("clearQSPPBtn", "Clear Selection")),
+               column(3,selectInput("QMethodsel", "Select Method", choices = c("None"="","All", cmethods$KREST_CDE), multiple = TRUE, selected = "All"),actionButton("clearQMethodBtn", "Clear Selection"))
+
              ),
              hr(),
              fluidRow(
@@ -404,13 +421,14 @@ server <- function(input, output, session) {
     }
   }
 
-
-  log_file <- tempfile(fileext = ".log")
+  log_file <<- tempfile(fileext = ".log")
   log_con <- file(log_file, open = "wt")
-  system2("cmd.exe",
-          args = c("/c", "start", "powershell", "-NoExit", "-Command",
-                   sprintf("Get-Content '%s' -Wait -Tail 10", log_file)),
-          wait = FALSE)
+  # if (input$Consolecheckbox) {
+  # system2("cmd.exe",
+  #         args = c("/c", "start", "powershell", "-NoExit", "-Command",
+  #                  sprintf("Get-Content '%s' -Wait -Tail 10", log_file)),
+  #         wait = FALSE)
+  # }
   # Divert console output to our temporary log file
  # sink(log_file, type = "output", split = TRUE)
   sink(log_con, type = "message")
@@ -463,6 +481,7 @@ server <- function(input, output, session) {
   #####################**********************************##################################
   trigger <- reactiveVal(0)
   df <- data.frame()
+  auto_notify(Sys.timezone(location = TRUE))
   auto_notify(Sys.time() %>% as.character)
   auto_notify(Sys.info()["user"])
   auto_notify(R.Version())
@@ -481,6 +500,18 @@ server <- function(input, output, session) {
     Aclear = FALSE,
     Eclear = FALSE
   )
+  observeEvent(input$Consolecheckbox, {
+    showNotification(paste("Console Window  :", input$Consolecheckbox))
+    if (input$Consolecheckbox) {
+    system2("cmd.exe",
+            args = c("/c", "start", '"MyRLogMonitor"', "powershell", "-NoExit", "-Command",
+                     sprintf("Get-Content '%s' -Wait -Tail 10", log_file)),
+            wait = FALSE)
+    } else {
+      # Kill the window matching that exact title
+      system2("taskkill", args = c("/FI", '"WINDOWTITLE eq MyRLogMonitor"', "/F"))
+    }
+  })
 
   observe({
     req(input$excFILE)
@@ -589,9 +620,7 @@ server <- function(input, output, session) {
     req(input$savFile) ## ?req #  require that the input is available
 
     shinyjs::disable("runOuts")
-    #source("R/outlierCode/Outliers.R")
-    #source("R/outlierCode/adjust_validation_v2.R")
-    #source("R/outlierCode/crazy8s.R")
+
     iRECUIpkg::setupOAV()
     inFile <- input$savFile
     baseName <- tools::file_path_sans_ext(inFile$name)
@@ -768,6 +797,11 @@ server <- function(input, output, session) {
     #req(credentials()$user_auth)
     updateSelectInput(session, "Qsppsel", selected = character(0))
   })
+  observeEvent(input$clearQMethodBtn, {
+    #req(credentials()$user_auth)
+    updateSelectInput(session, "QMethodsel", selected = character(0))
+  })
+
 
   c("None"="","Standard Estimates", "Detailed Estimates")
 
@@ -803,6 +837,7 @@ server <- function(input, output, session) {
     req(input$QAreasel)
     req(input$Qsppgrpsel)
     req(input$Qsppsel)
+    req(input$QMethodsel)
 
     yrs <- paste(input$Qyrsel, collapse = ',')
 
@@ -826,6 +861,21 @@ server <- function(input, output, session) {
       sppgrp <- paste0("'", gsub(',', "', '", paste0(input$Qsppgrpsel, collapse = ',')), "'")
       sql2 <- buildsql(sql2, "ITEM_GROUP", sppgrp)
     }
+    if ('All' %notin% input$QMethodsel) {
+      method <- paste0("'", gsub(',', "', '", paste0(input$QMethodsel, collapse = ',')), "'")
+      sql2 <- buildsql(sql2, "METHOD", method)
+    }
+
+
+    if (input$source_slider == "CREST" & oracredsL) {
+      gtgC <- TRUE
+      dest <- "P"
+    } else if (input$source_slider == "KREST") {
+      gtgK <- TRUE
+      dest <- 0
+    }
+
+    if (gtgC || gtgK) {
 
     qry <- paste0(qry, sql2)
     # clipr::write_clip(qry)
@@ -842,6 +892,7 @@ server <- function(input, output, session) {
     return(rtn_list)
     } else {
       auto_notify("No connection to database")
+    }
     }
   })
 

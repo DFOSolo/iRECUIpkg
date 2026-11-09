@@ -158,7 +158,7 @@ validate_adjustments <- function(adjusts, excludes = NULL, excel_file = NULL) {
       problem_rows[["CrabPrawn_NonTrap"]] <- bad_rows2_nontrap
     }
 
-    cutoff_date <- as.Date("2018-04-01")
+    cutoff_date <- lubridate::make_date(year = 2018, month = 4, day = 1)
 
     valid_trapboat_crabprawn <- c(
       "Crab",
@@ -221,11 +221,11 @@ validate_adjustments <- function(adjusts, excludes = NULL, excel_file = NULL) {
     # ------------------- RULE 4 -------------------
     area_exceptions <- tibble::tribble(
       ~base_area, ~cutoff,
-      "A020",     as.Date("2020-04-01"),
-      "A019",     as.Date("2014-04-01"),
-      "A023",     as.Date("2014-04-01"),
-      "A029",     as.Date("2014-04-01"),
-      "A002",     as.Date("2014-04-01")
+      "A020",     lubridate::make_date(year = 2020, month = 4, day = 1),
+      "A019",     lubridate::make_date(year = 2014, month = 4, day = 1),
+      "A023",     lubridate::make_date(year = 2014, month = 4, day = 1),
+      "A029",     lubridate::make_date(year = 2014, month = 4, day = 1),
+      "A002",     lubridate::make_date(year = 2014, month = 4, day = 1)
     )
 
     bad_rows4 <- adjusts %>%
@@ -311,7 +311,8 @@ validate_adjustments <- function(adjusts, excludes = NULL, excel_file = NULL) {
         filter(df_month != majority_month)
 
       if (nrow(bad_month) > 0) {
-        month_label <- format(as.Date(paste0("2025-", majority_month, "-01")), "%B")
+        #month_label <- format(as.Date(paste0("2025-", majority_month, "-01")), "%B")
+        month_label <- format(lubridate::make_date(year = 2025, month = majority_month, day = 1), "%B")
         bad_month$Reason <- paste0(
           "datefished must be in the majority month (", month_label,
           " ", majority_year, ")"

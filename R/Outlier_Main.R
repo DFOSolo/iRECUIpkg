@@ -21,6 +21,7 @@
 #' @export
 processSav <- function(SavDat, xlsFile, HABAG, CNBAG, COBAG, ENCBAG, ANN_CN, ANN_LC, ANN_HA, excludes,
                        adjusts, areaout_returns, FRIS_USE, FRIS_GRACE){
+
   data_path <- system.file("extdata", "areas.csv", package = "iRECUIpkg")
   areas_df <- read.csv(data_path) %>%
     select_all(tolower)
@@ -43,16 +44,20 @@ processSav <- function(SavDat, xlsFile, HABAG, CNBAG, COBAG, ENCBAG, ANN_CN, ANN
     stp = 1
     auto_notify(paste0(xlsFile," ", HABAG," ",CNBAG))
   # process the SAV file to the same format as the current system and apply the adjusts and excludes
-  SavDat <- LoadSav(SavDat, excludes, adjusts)
+    auto_notify("Starting Loading SAV file")
 
-  incProgress(1/ tstps, detail = paste("Loading FRIS Data ", stp))
-  stp = stp + 1
+   SavDat <- LoadSav(SavDat, excludes, adjusts)
+   auto_notify("Finished Loading SAV file")
+
+   incProgress(1/ tstps, detail = paste("Loading FRIS Data ", stp))
+   stp = stp + 1
   # check to ensure we can make a connection to FRIS or not.  Force use fris to false if no connection
   # this should actually try to build the connection as well.
   if (!oracredsL) {FRIS_USE = FALSE}
 
   # If using Fris pull the applicable daily limits strata
   if (FRIS_USE) {
+    auto_notify("Loading FRIS data")
   fris_d <- GetYearMonth(SavDat)
   fris_yr <- year(fris_d)
   fris_mn <- month(fris_d)
@@ -68,6 +73,7 @@ order by cast(pfma as number), species")
   fris_data <- fris_data %>%
     left_join(areas_df, join_by("AREA_NAME"=="area_name"))
   } else {
+    auto_notify("Loading FRIS Proxy Data")
     # if not using FRIS, pull some bogus data that won't link so the process is easier to flow.  Kind of a hack.
     data_path <- system.file("extdata", "fris_data.csv", package = "iRECUIpkg")
     fris_data <- read.csv(data_path)
@@ -136,7 +142,8 @@ order by cast(pfma as number), species")
 #' @export
 buildOutlierXLS <- function(n_dfs,flagged_df, Dups_df){
   auto_notify("create Work Book")
-  wrkbk = openxlsx::createWorkbook() #type = 'xlsx'
+  wrkbk <- openxlsx::createWorkbook() # timezone warnings!
+
   auto_notify("Catch Outliers")
   auto_notify("Create Sheet Catch Outliers")
   options("openxlsx.dateFormat" = "yyyy-mm-dd")
@@ -574,6 +581,7 @@ LoadNeighbours <- function(neighbours_df,areas_df){
 LoadSav <- function (SavDat, excludes, adjusts) {
    # check to see if the data is in EKOS format or not then assumed to be PRA format
    # this forces the surveystartdate to April 2012 if it is seems like EKOS
+
     if ("REPYEAR" %in% names(SavDat)) {
       SurveyStartDate <- as.Date("2012-04-01")
     }

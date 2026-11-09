@@ -7,7 +7,8 @@
 UnspecifiedText <- "Unspecified"
 
 "%notin%" <- Negate("%in%")
-PraStartDate <- as.Date("2015-07-01")
+
+PraStartDate <- lubridate::make_date(year = 2015, month = 7, day = 1)
 
 #' Clear Log Messages
 #'

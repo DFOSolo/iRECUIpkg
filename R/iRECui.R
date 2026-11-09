@@ -136,7 +136,20 @@ left join otolith_V1.refdata_resource_types rt on chc.rsty_id_id = rt.rsty_id
 left join otolith_V1.creel_irec_retainability r on i.retainability_id_id = r.retainability_id"
 df_spp <<- getdata(Lcon, sppqry)
 
+mqry <- "select min(method_id) as id, krest_Cde from otolith_v1.creel_irec_method
+group by krest_cde
+order by  min(method_id)"
+cmethods <<- getdata(Lcon, mqry)
+
  } else {
+
+   if (!is.null(ctx_session)) {
+     data_pathM <- system.file("extdata", "CRESTMethodsLookup.csv", package = "iRECUIpkg")
+   } else {
+     # not runnig as a package so full path to csv's is needed
+     data_pathM <- "inst\\extdata\\CRESTMethodsLookup.csv"
+   }
+   cmethods <<- read.csv(data_pathM)
    data_path <- system.file("extdata", "areasDFO.csv", package = "iRECUIpkg")
    areas_dfO <- read.csv(data_path)
    areas_dfO <- dplyr::select_all(areas_dfO, tolower)

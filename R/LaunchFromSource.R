@@ -1,5 +1,5 @@
 libpath <- Sys.getenv("R_LIBS_USER")
-message(libpath)
+#message(libpath)
 # create local user library path (not present by default)
 dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
 
@@ -11,6 +11,8 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 
 "%notin%" <- Negate("%in%")
 setVer <- function(){
+
+  Sys.timezone(location = TRUE)
   tday <- lubridate::now()
   yr <- lubridate::year(tday)
   mn <- lubridate::month(tday)
@@ -32,8 +34,10 @@ clearEnv <- function(){
 gs <- function() {
   clearEnv()
   setVer()
+  message(paste0("document ", Sys.timezone(location = TRUE)))
   devtools::document()
   devtools::load_all()
+  options(warn = 0) # 2 = error
   iRECUIpkg::run_iRECUI()
 }
 

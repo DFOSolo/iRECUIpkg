@@ -48,6 +48,7 @@ GetYearMonth <- function(dfIn) {
 #' parameters are:
 #' SavDat = response file with item = "datefished" as the date field to check/correct
 fixDates <- function(SavDat){
+
   d <- try(as.Date(subset(SavDat, !is.na(datefished))$datefished[[1]], format="%Y-%m-%d"))
   if("try-error" %in% class(d) || is.na(d)) {
     auto_notify("Date wasn't correct!")

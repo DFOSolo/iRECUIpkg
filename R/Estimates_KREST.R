@@ -1420,15 +1420,15 @@ LoadxlsxFromCREST <- function (source_id) {
   # unzip the file
   extracted_path <- unzip(tmpfile, files = d$FILENAME[[1]], exdir = tempdir())
   # read all(?) of the sheets in the xlsx file into a list of data frames
-  sheet_names <- openxlsx::getSheetNames(extracted_path)
+  sheet_names <- openxlsx::getSheetNames(extracted_path$path)
   sheet_list <- as.list(rep(NA, length(sheet_names)))
   names(sheet_list) <- sheet_names
   for (sn in sheet_names) {
-    sheet_list[[sn]] <- openxlsx::read.xlsx(extracted_path, sheet = sn)
+    sheet_list[[sn]] <- openxlsx::read.xlsx(extracted_path$path, sheet = sn)
   }
   # clean up the temp files
   file.remove(tmpfile)
-  file.remove(extracted_path)
+  file.remove(extracted_path$path)
   return(sheet_list)
 }
 
